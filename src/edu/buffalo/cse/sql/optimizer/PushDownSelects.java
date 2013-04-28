@@ -72,12 +72,18 @@ public class PushDownSelects extends PlanRewrite{
 				Iterator itremove= lsremove.iterator();
 				while(itremove.hasNext()){
 					ExprTree expremove=(ExprTree) itremove.next();
-					if(objSelect.getCondition().equals(expremove)){
-						ExprTree expr=null;
-						objSelect.setCondition(expr);
-					}
-					else
+//					if(objSelect.getCondition().equals(expremove)){
+//						ExprTree expr=new ExprTree();
+//						objSelect.setCondition("");
+//					}
+					//else
 						objSelect.getCondition().remove(expremove);
+						if(objSelect.getCondition()!=null || !objSelect.getCondition().isEmpty()){
+							ExprTree.OpCode op=objSelect.getCondition().get(0).op;
+							objSelect.setCondition(objSelect.getCondition().get(0));
+							//objSelect.getCondition().op=op;
+							System.out.println("");
+						}
 				}
 			}
 			node=objSelect;

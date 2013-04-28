@@ -107,6 +107,7 @@ public class Sql {
 		}
 
 		System.out.println(output.toString());
+		flag_hmp_tables_col_used=false;
 
 		return f1;
 
