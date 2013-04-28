@@ -1,0 +1,3 @@
+
+java -cp $(dirname $0)/bin edu.buffalo.cse.sql.test.AGG01 $*
+
