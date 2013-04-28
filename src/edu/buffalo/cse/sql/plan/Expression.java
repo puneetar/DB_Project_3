@@ -915,7 +915,8 @@ public class Expression extends ExprTree {
 				}
 				else if(e.getClassName().equals("edu.buffalo.cse.sql.plan.Aggregate"))
 				{
-					return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(cf.v.toInt()));
+					//return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(cf.v.toInt()));
+					return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(0));
 				}
 			}
 			//			if(schemaOfData.isEmpty()){
