@@ -37,7 +37,9 @@ public class Sql {
 
 	public static void main( String[] args )
 	{
+
 		//System.out.println("You have utkarsr u mad or not h!");
+
 		try {
 			List<List<Datum[]>> result=Sql.execFile(new File(args[0]));
 
