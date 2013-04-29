@@ -38,7 +38,7 @@ public class Sql {
 	public static void main( String[] args )
 	{
 
-		//System.out.println("You have nothing!");
+		//System.out.println("You have asdasdasdanothing!");
 
 		try {
 			List<List<Datum[]>> result=Sql.execFile(new File(args[0]));
