@@ -38,17 +38,12 @@ public class Sql {
 	public static void main( String[] args )
 	{
 
-
-		//System.out.println("You haveasdasddsasdasd nothing!");
-
-
-
 		try {
 			List<List<Datum[]>> result=Sql.execFile(new File(args[0]));
 
 			TableBuilder output = new TableBuilder();
 			//			    for(Schema.Column c : querySchema){
-			//			      outputasdasdasdasdasd.newCell(c.getName());
+			//			      output.newCell(c.getName());
 			//			      cols++;
 			//			    }
 			Iterator<Datum[]> resultIterator=result.iterator().next().iterator();
