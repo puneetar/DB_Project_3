@@ -34,26 +34,26 @@ public class ScanNode extends PlanNode.Leaf {
 		this(table, table, schema);
 	}
 	public ExprTree getCondition() {
-		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
-			setSchemaVars();
-			flag_setSchemaVar=true;
-		}
+//		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
+//			setSchemaVars();
+//			flag_setSchemaVar=true;
+//		}
 		return condition;
 	}
 	public void setCondition(ExprTree condition) {
-		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
-			setSchemaVars();
-			flag_setSchemaVar=true;
-		}
+//		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
+//			setSchemaVars();
+//			flag_setSchemaVar=true;
+//		}
 		this.condition = condition;
 	}
 	
 
 	public String detailString(){
-		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
-			setSchemaVars();
-			flag_setSchemaVar=true;
-		}
+//		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
+//			setSchemaVars();
+//			flag_setSchemaVar=true;
+//		}
 		StringBuilder sb = new StringBuilder(super.detailString());
 		String sep = "";
 
@@ -74,6 +74,7 @@ public class ScanNode extends PlanNode.Leaf {
 	{
 		
 		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
+			System.out.println("doing set Schema Vars");
 			setSchemaVars();
 			flag_setSchemaVar=true;
 		}
