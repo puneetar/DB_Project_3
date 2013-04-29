@@ -146,14 +146,14 @@ public class Sql {
 		Iterator lsit=ls.iterator();
 		String colname=null;
 		String table=null;
-		String tablename1=null;
+		//String tablename1=null;
 		HashMap<String,List<String>> hmp= new HashMap<String,List< String>>();
 		List lscol=new ArrayList();
 		while(lsit.hasNext()){
 			ExprTree.VarLeaf vf=(VarLeaf) lsit.next();
 			colname=vf.name.name;
-			tablename1=vf.name.rangeVariable;
-			table=tablemap.get(tablename1);
+			table=vf.name.rangeVariable;
+			//table=tablemap.get(tablename1);
 			if( table==null){
 				table="nothing";
 			}
@@ -304,9 +304,9 @@ public class Sql {
 	//changes for Phase 3:starts
 	public static boolean findColName(HashMap hmp,String table,String Colname){
 		boolean bool=false;
-
-		if(hmp.containsKey(table)){
-			List ls=(List) hmp.get(table);
+		String t=tablemap.get(table);
+		if(hmp.containsKey(table ) || hmp.containsKey(t)){
+			List ls=(List) hmp.get(t);
 			if(ls.contains(Colname)){
 				bool=true;
 			}	
