@@ -29,7 +29,7 @@ public class Schema {
   };
   
   public static class Var {
-    public final String rangeVariable;
+    public String rangeVariable;
     public final String name;
 
     public Var(String rangeVariable, String name) 

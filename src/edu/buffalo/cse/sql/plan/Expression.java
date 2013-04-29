@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.buffalo.cse.sql.Schema;
+import edu.buffalo.cse.sql.Sql;
 import edu.buffalo.cse.sql.Schema.Type;
 import edu.buffalo.cse.sql.Schema.Var;
 import edu.buffalo.cse.sql.data.Datum;
@@ -935,7 +936,10 @@ public class Expression extends ExprTree {
 			Iterator<Var> it=schemaOfData.iterator();
 			int i=0;
 			while(it.hasNext()){
-				if(it.next().equals(vf.name))
+				Schema.Var var1=it.next();
+				if(Sql.tablemap.get(var1.rangeVariable).equals(vf.name.rangeVariable))
+					vf.name.rangeVariable=var1.rangeVariable;
+				if(var1.equals(vf.name))
 					index=i;
 				i++;
 			}

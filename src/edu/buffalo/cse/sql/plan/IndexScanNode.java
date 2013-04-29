@@ -75,8 +75,8 @@ public IndexScanNode(String table, String rangeVariable, Schema.Table schema,Exp
   public void setSchemaVars(){
 		List<String> ls_col_name=new ArrayList<String>();
 		
-		if(Sql.hmp_tables_col_used.get(table)!=null)		
-		ls_col_name.addAll(Sql.hmp_tables_col_used.get(table));
+		if(Sql.hmp_tables_col_used.get(Sql.tablemap.get(table))!=null)		
+		ls_col_name.addAll(Sql.hmp_tables_col_used.get(Sql.tablemap.get(table)));
 		
 		if(Sql.hmp_tables_col_used.get("nothing")!=null)
 		ls_col_name.addAll(Sql.hmp_tables_col_used.get("nothing"));

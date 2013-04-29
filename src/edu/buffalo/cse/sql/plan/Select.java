@@ -34,6 +34,7 @@ public class Select extends SelectionNode{
 	public List<Datum[]> doSelect() throws CastError{
 		dataForExp = Utility.switchNodes(s.getChild());
 		schemaForExp = s.getChild().getSchemaVars(); 
+		System.out.println();
 		if(s.condition!=null && !s.condition.isEmpty()){
 			List<Datum[]> lsdatum = new Expression(s.condition,dataForExp,schemaForExp).doExpr();	
 			return lsdatum;

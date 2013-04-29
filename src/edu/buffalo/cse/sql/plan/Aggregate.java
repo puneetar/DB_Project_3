@@ -10,6 +10,7 @@ import java.util.List;
 
 import edu.buffalo.cse.sql.Schema;
 import edu.buffalo.cse.sql.Schema.Var;
+import edu.buffalo.cse.sql.Sql;
 //import edu.buffalo.cse.sql.Schema.Var;
 import edu.buffalo.cse.sql.data.Datum;
 import edu.buffalo.cse.sql.data.Datum.CastError;
@@ -48,13 +49,18 @@ public class Aggregate extends AggregateNode{
 			g=itGroup.next();
 			ExprTree e=g.expr;
 			ExprTree.VarLeaf vf= (ExprTree.VarLeaf)e;
-			Schema.Var schema=vf.name;
+			//vf.name.rangeVariable=Sql.tablemap.keySet().
+			//Schema.Var schema=vf.name;
+			
 			//int index=schemaForExp.indexOf(vf);
 			int index=0;
 			Iterator<Var> iter=schemaForExp.iterator();
 			int j=0;
 			while(iter.hasNext()){
-				if(iter.next().equals(vf.name))
+				Schema.Var var1=iter.next();
+				if(Sql.tablemap.get(var1.rangeVariable).equals(vf.name.rangeVariable))
+					vf.name.rangeVariable=var1.rangeVariable;
+				if(var1.equals(vf.name))
 					index=j;
 				j++;
 			}
