@@ -39,7 +39,7 @@ public class Sql {
 	{
 
 
-		//System.out.println("You have nothing!");
+		//System.out.println("You haveasdasddsasdasd nothing!");
 
 
 
