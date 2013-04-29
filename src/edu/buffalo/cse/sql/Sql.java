@@ -48,7 +48,7 @@ public class Sql {
 
 			TableBuilder output = new TableBuilder();
 			//			    for(Schema.Column c : querySchema){
-			//			      output.newCell(c.getName());
+			//			      outputasdasdasdasdasd.newCell(c.getName());
 			//			      cols++;
 			//			    }
 			Iterator<Datum[]> resultIterator=result.iterator().next().iterator();
