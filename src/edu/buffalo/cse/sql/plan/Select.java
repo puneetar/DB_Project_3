@@ -45,7 +45,7 @@ public class Select extends SelectionNode{
 
 	}
 	public List findcolumns(){
-		//pnode.getCoasdasdasasdasdlumns();
+		//pnode.getCoasdasdasasdasdasdasdasdasdddddddddddddddddddddddasdasdlumns();
 		ExprTree cond = s.condition;
 		List ls=new ArrayList();
 		if(cond!=null && !cond.isEmpty()){
