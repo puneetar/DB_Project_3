@@ -37,14 +37,15 @@ public class Sql {
 
 	public static void main( String[] args )
 	{
-		//System.out.println("You haven't  me yet!");
+		//System.out.println("You haven't implemented me yet!");
 		try {
 			List<List<Datum[]>> result=Sql.execFile(new File(args[0]));
 
 			TableBuilder output = new TableBuilder();
 			//			    for(Schema.Column c : querySchema){
 			//			      output.newCell(c.getName());
-			//			      cols++;
+			//			      
+			//cols++;
 			//			    }
 			Iterator<Datum[]> resultIterator=result.iterator().next().iterator();
 
