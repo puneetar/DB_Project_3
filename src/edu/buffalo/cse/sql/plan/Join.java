@@ -54,6 +54,7 @@ public class Join extends JoinNode {
 			ExprTree exp=join.getCondition();
 			List ls=new Expression(exp).findColumns();
 			List<Schema.Var> lsvar1=join.getLHS().getSchemaVars();
+			System.out.println();
 			List<Schema.Var> lsvar2= join.getRHS().getSchemaVars();
 			Iterator<Var> iter1=lsvar1.iterator();
 			Iterator<Var> iter3=lsvar2.iterator();
