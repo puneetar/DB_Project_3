@@ -26,6 +26,7 @@ public class Aggregate extends AggregateNode{
 		this.a=a;		//save the node
 	}
 	public List<Datum[]> doAggregate() throws CastError{
+		System.out.println("hello");
 		dataForExp = Utility.switchNodes(a.getChild());
 		schemaForExp = a.getChild().getSchemaVars(); 
 		//System.out.println(schemaForExp.isEmpty());
