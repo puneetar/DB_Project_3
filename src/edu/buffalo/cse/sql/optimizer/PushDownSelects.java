@@ -72,11 +72,11 @@ public class PushDownSelects extends PlanRewrite{
 				Iterator itremove= lsremove.iterator();
 				while(itremove.hasNext()){
 					ExprTree expremove=(ExprTree) itremove.next();
-//					if(objSelect.getCondition().equals(expremove)){
-//						ExprTree expr=new ExprTree();
-//						objSelect.setCondition("");
-//					}
-					//else
+					if(objSelect.getCondition().equals(expremove)){
+						ExprTree expr=null;
+						objSelect.setCondition(expr);
+					}
+					else{
 						objSelect.getCondition().remove(expremove);
 						if(objSelect.getCondition()!=null || !objSelect.getCondition().isEmpty()){
 							ExprTree.OpCode op=objSelect.getCondition().get(0).op;
@@ -84,6 +84,7 @@ public class PushDownSelects extends PlanRewrite{
 							//objSelect.getCondition().op=op;
 							System.out.println("");
 						}
+					}
 				}
 			}
 			node=objSelect;
@@ -102,7 +103,7 @@ public class PushDownSelects extends PlanRewrite{
 				node=objindex ;
 			}
 		}
-			return node;
+		return node;
 		case UNION:
 			return node;
 		default:

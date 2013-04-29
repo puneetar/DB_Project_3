@@ -33,6 +33,7 @@ public class Sql {
 	public static HashMap<String,List<String>> hmp_tables_col_used= null;
 	public static boolean flag_hmp_tables_col_used=false;
 	private static int flag_TPCH=0;
+	public static HashMap<String,String> tablemap= new HashMap<String,String>();
 
 	public static void main( String[] args )
 	{
@@ -73,43 +74,43 @@ public class Sql {
 
 	public static List<Datum[]> execQuery(Map<String, Schema.TableFromFile> tables,PlanNode q)throws SqlException
 	{	PushDownSelects objPush= new PushDownSelects(true);
-		PlanNode newq=objPush.rewrite(q);  
-		q=newq;
-		globalData(tables,q);
-		List<Schema.Var> list=q.getSchemaVars();
+	PlanNode newq=objPush.rewrite(q);  
+	q=newq;
+	globalData(tables,q);
+	List<Schema.Var> list=q.getSchemaVars();
 
-		Iterator<Schema.Var> it=list.iterator();
-		while(it.hasNext()){
-			Schema.Var sc=it.next();
+	Iterator<Schema.Var> it=list.iterator();
+	while(it.hasNext()){
+		Schema.Var sc=it.next();
 
-			System.out.println(sc.name+" : "+sc.rangeVariable);
+		System.out.println(sc.name+" : "+sc.rangeVariable);
+	}
+
+	System.out.println("GLOBAL data made");
+	List<Datum[]> f1=Utility.switchNodes(q);
+
+
+	TableBuilder output = new TableBuilder();
+
+	//	    for(Schema.Column c : querySchema){
+	//	      output.newCell(c.getName());
+	//	      cols++;
+	//	    }
+	Iterator<Datum[]> resultIterator=f1.iterator();
+
+	output.addDividerLine();
+	while(resultIterator.hasNext()){
+		Datum[] row = resultIterator.next();
+		output.newRow();
+		for(Datum d : row){
+			output.newCell(d.toString());
 		}
+	}
 
-		System.out.println("GLOBAL data made");
-		List<Datum[]> f1=Utility.switchNodes(q);
+	System.out.println(output.toString());
+	flag_hmp_tables_col_used=false;
 
-
-		TableBuilder output = new TableBuilder();
-
-		//	    for(Schema.Column c : querySchema){
-		//	      output.newCell(c.getName());
-		//	      cols++;
-		//	    }
-		Iterator<Datum[]> resultIterator=f1.iterator();
-
-		output.addDividerLine();
-		while(resultIterator.hasNext()){
-			Datum[] row = resultIterator.next();
-			output.newRow();
-			for(Datum d : row){
-				output.newCell(d.toString());
-			}
-		}
-
-		System.out.println(output.toString());
-		flag_hmp_tables_col_used=false;
-
-		return f1;
+	return f1;
 
 	}
 
@@ -145,12 +146,14 @@ public class Sql {
 		Iterator lsit=ls.iterator();
 		String colname=null;
 		String table=null;
+		String tablename1=null;
 		HashMap<String,List<String>> hmp= new HashMap<String,List< String>>();
 		List lscol=new ArrayList();
 		while(lsit.hasNext()){
 			ExprTree.VarLeaf vf=(VarLeaf) lsit.next();
 			colname=vf.name.name;
-			table=vf.name.rangeVariable;
+			tablename1=vf.name.rangeVariable;
+			table=tablemap.get(tablename1);
 			if( table==null){
 				table="nothing";
 			}
@@ -169,10 +172,8 @@ public class Sql {
 				hmp.put(table, lscol);
 			}
 
-
-
 		}
-		
+
 		hmp_tables_col_used=hmp;
 		flag_hmp_tables_col_used=true;
 

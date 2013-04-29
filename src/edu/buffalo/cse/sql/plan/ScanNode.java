@@ -27,6 +27,7 @@ public class ScanNode extends PlanNode.Leaf {
 		this.table = table; 
 		this.schema = schema.changeRangeVariable(rangeVariable);
 		this.condition=null;
+		Sql.tablemap.put(rangeVariable, table);
 	}
 	public ScanNode(String table, Schema.Table schema) 
 	{
