@@ -37,7 +37,7 @@ public class Sql {
 
 	public static void main( String[] args )
 	{
-		//System.out.println("You haven't implemented me yet!");
+		//System.out.println("You have implemented me yet!");
 		try {
 			List<List<Datum[]>> result=Sql.execFile(new File(args[0]));
 
