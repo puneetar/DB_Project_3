@@ -64,11 +64,11 @@ void Statement(Program p) :
   }
 
 void Table(Program p) :
-  { Token tableName=null; Schema.Table schema=null; 
+  { Token tableName; Schema.Table schema; 
     String file = null; }
   { <CREATE> <TABLE> tableName = <ID> 
     <LPAREN> schema = TableSchema() <RPAREN> 
-    ( <FROM> <FILE> file = StringBase() <USING> (<CSV>|< TPCH ><LPAREN ><STRING ><RPAREN >setTPCH()) )?
+    ( <FROM> <FILE> file = StringBase() <USING> <CSV> )?
     { 
       try { 
         p.addTable(tableName.image, 
@@ -79,12 +79,6 @@ void Table(Program p) :
     }
   }
 
-void setTPCH():
-{}
-{{
-  System.out.println("in TPCH");
-  Sql.setTpch();}	
-}
 Schema.Table TableSchema() :
   { Schema.Table schema = new Schema.Table();
     Schema.Column col; }
