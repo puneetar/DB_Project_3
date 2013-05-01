@@ -17,7 +17,7 @@ public class Select extends SelectionNode{
 	public Select(SelectionNode s) {
 		super(s.condition);
 		this.s=s;
-		// TODO Auto-generated constructor stub
+		
 	}
 
 

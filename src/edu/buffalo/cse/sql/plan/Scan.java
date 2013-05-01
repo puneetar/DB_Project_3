@@ -22,7 +22,7 @@ public class Scan extends ScanNode {
 	public Scan(ScanNode objScan) {
 
 		super(objScan.table,objScan.schema);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public List<Datum[]> doScan(){

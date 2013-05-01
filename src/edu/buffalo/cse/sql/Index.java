@@ -132,7 +132,7 @@ public class Index {
       }
       
       System.out.println("Getting: "+Datum.stringOfRow(get));
-      get = idx.get(get);
+     //TODO index.java  get = idx.get(get);
       System.out.println("Got: "+((get==null)?"Nothing"
                                              :Datum.stringOfRow(get)));
     

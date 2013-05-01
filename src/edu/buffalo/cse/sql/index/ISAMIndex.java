@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import edu.buffalo.cse.sql.buffer.BufferException;
 import edu.buffalo.cse.sql.buffer.ManagedFile;
 import edu.buffalo.cse.sql.buffer.FileManager;
 import edu.buffalo.cse.sql.test.TestDataStream;
+import edu.buffalo.cse.sql.util.ManageList;
 
 public class ISAMIndex implements IndexFile {
 	public static int pageNo=0;
@@ -70,11 +72,11 @@ public class ISAMIndex implements IndexFile {
 				} 
 			}
 			datumBuffer.write(row); 	 
-//			System.out.print("LeafPage: "+pageNo+" value:");
-//			for(Datum d:row){
-//				System.out.print(" "+d.toInt());
-//			}
-//			System.out.println();
+			//			System.out.print("LeafPage: "+pageNo+" value:");
+			//			for(Datum d:row){
+			//				System.out.print(" "+d.toInt());
+			//			}
+			//			System.out.println();
 		}//end of logic for leaves
 		mf.unpin(pageNo,true);
 		BuildIndex(hmp,key,fm,mf,data);
@@ -88,22 +90,22 @@ public class ISAMIndex implements IndexFile {
 		//Iterator it1=hmp.entrySet().iterator();
 		//int pageNo=0;
 		pageNo=pageNo+1;
-	//	System.out.println("******* hmp *******");
-//		while(it1.hasNext()){
-//			Map.Entry<Integer,Datum[]> pairs1=(Map.Entry)it1.next();
-//			int keyyy=pairs1.getKey();
-//			Datum[] row1=(Datum[]) pairs1.getValue();
-//		//	Datum[] indexKey1=key.createKey(row1);
-//			//System.out.println("Page No :"+pairs1.getKey()+" Row:"+key.createKey(pairs1.getValue())[0]);
-//			System.out.print("pageNo: "+keyyy+" Row:");
-//			if(pageNo==3226){
-//				System.out.print("");
-//			}
-//			for(Datum d:row1){
-//				System.out.print(" "+d.toInt());
-//			}
-//			System.out.println();
-//		}
+		//	System.out.println("******* hmp *******");
+		//		while(it1.hasNext()){
+		//			Map.Entry<Integer,Datum[]> pairs1=(Map.Entry)it1.next();
+		//			int keyyy=pairs1.getKey();
+		//			Datum[] row1=(Datum[]) pairs1.getValue();
+		//		//	Datum[] indexKey1=key.createKey(row1);
+		//			//System.out.println("Page No :"+pairs1.getKey()+" Row:"+key.createKey(pairs1.getValue())[0]);
+		//			System.out.print("pageNo: "+keyyy+" Row:");
+		//			if(pageNo==3226){
+		//				System.out.print("");
+		//			}
+		//			for(Datum d:row1){
+		//				System.out.print(" "+d.toInt());
+		//			}
+		//			System.out.println();
+		//		}
 		LinkedHashMap hmp1= new LinkedHashMap();
 		ByteBuffer byteBuffer=null;
 		DatumBuffer datumBuffer=null;
@@ -121,7 +123,7 @@ public class ISAMIndex implements IndexFile {
 				Datum[] val=new Datum[1];
 				val[0]=new Datum.Int(Leafpage);
 				datumBuffer.write(val);
-			//	System.out.println("Val:"+val[0].toInt());
+				//	System.out.println("Val:"+val[0].toInt());
 			}
 			else{
 				if(DatumSerialization.getLength(row)+4>datumBuffer.remaining()-8){
@@ -135,15 +137,15 @@ public class ISAMIndex implements IndexFile {
 					Datum[] val=new Datum[1];
 					val[0]=new Datum.Int(Leafpage);
 					datumBuffer.write(val);
-				//	System.out.println("Val:"+val[0].toInt());
+					//	System.out.println("Val:"+val[0].toInt());
 				} 
 				else{
 					datumBuffer.write(indexKey);
 					//System.out.print("Key:");
-//					for(Datum d:indexKey){
-//						System.out.print(" "+d.toInt());
-//					}
-//					System.out.println();
+					//					for(Datum d:indexKey){
+					//						System.out.print(" "+d.toInt());
+					//					}
+					//					System.out.println();
 					//System.out.print("Key:"+indexKey.toInt());
 					Datum[] val=new Datum[1];
 					val[0]=new Datum.Int(Leafpage);
@@ -156,20 +158,20 @@ public class ISAMIndex implements IndexFile {
 		}
 		mf.unpin(pageNo,true);
 		if(hmp1.size()>1){
-//			Iterator it2=hmp1.entrySet().iterator();
-//			//System.out.println("******* hmp1 *******");
-//			while(it2.hasNext()){
-//				Map.Entry<Integer,Datum[]> pairs2=(Map.Entry)it2.next();
-//				int key1=pairs2.getKey();
-//				//System.out.print("Key: "+key1+" Value:");
-//				Datum[] row2=(Datum[]) pairs2.getValue();
-//				//Datum[] indexKey2=key.createKey(row2);
-//				for(Datum d:row2){
-//					//System.out.print(" "+d.toInt());
-//				}
-//				//System.out.println();
-//				//System.out.println("Page No :"+pairs2.getKey()+" Row:"+key.createKey(pairs2.getValue())[0]);
-//			}
+			//			Iterator it2=hmp1.entrySet().iterator();
+			//			//System.out.println("******* hmp1 *******");
+			//			while(it2.hasNext()){
+			//				Map.Entry<Integer,Datum[]> pairs2=(Map.Entry)it2.next();
+			//				int key1=pairs2.getKey();
+			//				//System.out.print("Key: "+key1+" Value:");
+			//				Datum[] row2=(Datum[]) pairs2.getValue();
+			//				//Datum[] indexKey2=key.createKey(row2);
+			//				for(Datum d:row2){
+			//					//System.out.print(" "+d.toInt());
+			//				}
+			//				//System.out.println();
+			//				//System.out.println("Page No :"+pairs2.getKey()+" Row:"+key.createKey(pairs2.getValue())[0]);
+			//			}
 			hmp=hmp1;
 			BuildIndex(hmp,key,fm,mf,data);
 		}
@@ -278,7 +280,7 @@ public class ISAMIndex implements IndexFile {
 			while(j<=((((dataBuffer.length()/2)*keySpec.keySchema().length) +(dataBuffer.length()-dataBuffer.length()/2)) *4)-4){
 				j=j+4;
 				indexKey=DatumSerialization.read(byteBuffer,j,keySpec.keySchema());
-		//		System.out.println(indexKey[0].toInt());
+				//		System.out.println(indexKey[0].toInt());
 				int offset=keySpec.compare(indexKey, toKey);
 				if(offset==1){
 					pointer=DatumSerialization.read(byteBuffer,j-4,Schema.Type.INT).toInt();
@@ -300,12 +302,14 @@ public class ISAMIndex implements IndexFile {
 		byteBuffer=file.safePin(pointer);
 		dataBuffer = new DatumBuffer(byteBuffer,keySpec.rowSchema());
 		int offset=2;
+		int first=0;
 		for(int i=0;i<dataBuffer.length();i++){
 			Datum[] row=dataBuffer.read(i);
 			Datum[] key=keySpec.createKey(row);
 			offset=keySpec.compare(key, toKey);
 			if(offset==0 ){
 				maxrecord=dataBuffer.read(i);
+				first=i; //change for phase 3
 				break;
 			}
 			else if(offset==1){
@@ -318,6 +322,39 @@ public class ISAMIndex implements IndexFile {
 			}
 
 		}
+		//changes for phase 3:starts
+		if(offset==0){
+			int max=maxpage(root);
+			int i=0;
+			while(pointer<=max){
+				byteBuffer=file.safePin(pointer);
+				dataBuffer = new DatumBuffer(byteBuffer,keySpec.rowSchema());
+				for( i=first;i<dataBuffer.length();i++){
+					Datum[] row=dataBuffer.read(i);
+					Datum[] key=keySpec.createKey(row);
+					offset=keySpec.compare(key, toKey);
+					if(offset==0 ){
+						maxrecord=dataBuffer.read(i);
+					}
+					else{
+						break;
+					}
+				}
+				if( i==dataBuffer.length() && offset==0){
+					file.unpin(pointer);
+					pointer=pointer+1;
+					first=0;
+				}
+				else
+				{	
+					if( i==0)
+						pointer=pointer-1;
+					break;
+				}
+			}
+		}
+		index.maxPage(pointer);
+		//changes for phase 3:ends
 		index.maxRecord(maxrecord);	
 		index.ready();
 		return index;
@@ -386,7 +423,7 @@ public class ISAMIndex implements IndexFile {
 			while(j<=((((dataBuffer.length()/2)*keySpec.keySchema().length) +(dataBuffer.length()-dataBuffer.length()/2)) *4)-4){
 				j=j+4;
 				indexKey=DatumSerialization.read(byteBuffer,j,keySpec.keySchema());
-			//	System.out.println(indexKey[0].toInt());
+				//	System.out.println(indexKey[0].toInt());
 				int offset=keySpec.compare(indexKey, fromKey);
 				if(offset==1){
 					pointer=DatumSerialization.read(byteBuffer,j-4,Schema.Type.INT).toInt();
@@ -398,7 +435,7 @@ public class ISAMIndex implements IndexFile {
 				}
 			}
 		}
-		
+
 		int currecord=0;
 		int currpage=pointer;
 		byteBuffer=file.safePin(pointer);
@@ -420,14 +457,14 @@ public class ISAMIndex implements IndexFile {
 			else{
 				if(i==dataBuffer.length()-1){
 					if(pointer!=prev-1){
-					currpage=pointer+1;
-					currecord=0;
+						currpage=pointer+1;
+						currecord=0;
 					}
 					else
 						currecord=i;
 				}
 				else
-				 currecord=i;
+					currecord=i;
 			}
 
 		}
@@ -440,27 +477,27 @@ public class ISAMIndex implements IndexFile {
 	}
 
 	public IndexIterator rangeScan(Datum[] start, Datum[] end)throws SqlException, IOException
-			{
-		
-		       DatumStreamIterator index=new DatumStreamIterator(file,keySpec.rowSchema());
-		       ISAMIndex isam=new ISAMIndex(file, keySpec);
-		       
-		       DatumStreamIterator to=(DatumStreamIterator)isam.rangeScanTo(end);
-		       
-		       DatumStreamIterator from=(DatumStreamIterator)isam.rangeScanFrom(start);
-		       
-		       index.currPage(from.currPage);
-		       index.currRecord(from.currRecord);
-		       index.maxPage(to.maxPage);
-		       index.maxRecord(to.maxRecord);
-		       
-		       index.ready();
-		       
-		       return index;
-				
-			}
+	{
 
-	public Datum[] get(Datum[] key) throws SqlException, IOException
+		DatumStreamIterator index=new DatumStreamIterator(file,keySpec.rowSchema());
+		ISAMIndex isam=new ISAMIndex(file, keySpec);
+
+		DatumStreamIterator to=(DatumStreamIterator)isam.rangeScanTo(end);
+
+		DatumStreamIterator from=(DatumStreamIterator)isam.rangeScanFrom(start);
+
+		index.currPage(from.currPage);
+		index.currRecord(from.currRecord);
+		index.maxPage(to.maxPage);
+		index.maxRecord(to.maxRecord);
+
+		index.ready();
+
+		return index;
+
+	}
+
+	public List<Datum[]> get(Datum[] key) throws SqlException, IOException
 	{
 		int value=0;
 		int pageNo=file.size()-1;
@@ -495,7 +532,7 @@ public class ISAMIndex implements IndexFile {
 			while(j<=((((dataBuffer.length()/2)*keySpec.keySchema().length) +(dataBuffer.length()-dataBuffer.length()/2)) *4)-4){
 				j=j+4;
 				indexKey=DatumSerialization.read(byteBuffer,j,keySpec.keySchema());
-			//	System.out.println(indexKey[0].toInt());
+				//	System.out.println(indexKey[0].toInt());
 				int offset=keySpec.compare(indexKey, key);
 				if(offset==1){
 					pointer=DatumSerialization.read(byteBuffer,j-4,Schema.Type.INT).toInt();
@@ -507,13 +544,13 @@ public class ISAMIndex implements IndexFile {
 				}
 			}
 		}
-		
+
 
 		Datum[] finalRow=null;
 		byteBuffer=file.safePin(pointer);
 		dataBuffer = new DatumBuffer(byteBuffer,keySpec.rowSchema());
 		int offset=2;
-		
+
 		for(int i=0;i<dataBuffer.length();i++){
 			Datum[] row=dataBuffer.read(i);
 			Datum[] rowkey=keySpec.createKey(row);
@@ -524,8 +561,30 @@ public class ISAMIndex implements IndexFile {
 			}
 		}
 		file.unpin(pointer);
-		return finalRow;
-		
+		return new ManageList().toListOfDatumArray(finalRow);
+
 	}
+
+	public int maxpage(int pointer) throws BufferException, IOException, CastError{
+		ByteBuffer byteBuffer=null;
+		DatumBuffer dataBuffer=null;
+		int value=0;
+		int nextpointer=0;
+		int prev=0;
+		while(true){
+			byteBuffer=file.safePin(pointer);
+			value=DatumSerialization.read(byteBuffer,0,Schema.Type.INT).toInt();
+			if(value==-1){
+				file.unpin(pointer);
+				break;
+			}
+			nextpointer= DatumSerialization.read(byteBuffer,4,Schema.Type.INT).toInt();
+			file.unpin(pointer);
+			prev=pointer;
+			pointer=nextpointer;
+		}
+		return prev-1;
+	}
+
 
 }
