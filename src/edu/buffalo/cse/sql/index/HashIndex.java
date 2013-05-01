@@ -174,36 +174,6 @@ public class HashIndex implements IndexFile {
 		int pos;
 		pos = db.find(key);
 		Datum res[] = db.read(pos);
-		if(keySpec.compare(keySpec.createKey(res), key)==0){
-			while(keySpec.compare(keySpec.createKey(res), key)==0 && !(pos>db.length())){
-				finalDatum.add(res);
-				pos+=1;
-				res = db.read(pos);
-			}
-			if(pos>db.length()){
-				int page = bucket;
-				do{
-					mf.unpin(page);
-					page = DatumSerialization.read(buffer, 0, Schema.Type.INT).toInt();
-					buffer = mf.pin(page);
-					db = new DatumBuffer(buffer,keySpec.rowSchema());
-					int pos1 = db.find(key);
-					res = db.read(pos1);
-					while(keySpec.compare(keySpec.createKey(res), key)==0 && !(pos1>db.length())){
-						finalDatum.add(res);
-						pos1+=1;
-						res = db.read(pos1);
-					}
-					if(keySpec.compare(keySpec.createKey(res), key)!=0)
-						break;
-				}while(!(DatumSerialization.read(buffer, 0, Schema.Type.INT).equals(new Datum.Int(-1))));
-				mf.unpin(page);
-				return finalDatum;
-			}
-			mf.unpin(bucket);
-			return finalDatum;
-		}
-		//mf.pin(bucket);
 		int tempPage=bucket;
 		while(keySpec.compare(keySpec.createKey(res), key)!=0 && !(DatumSerialization.read(buffer, 0, Schema.Type.INT).equals(new Datum.Int(-1)))){
 			mf.unpin(tempPage);	// here or after next Line
@@ -213,34 +183,31 @@ public class HashIndex implements IndexFile {
 			pos = db.find(key);
 			res = db.read(pos);
 		}
-//		if((db.find(key))!=0){
 		if(keySpec.compare(keySpec.createKey(res), key)==0){
-			//pos = db.find(key);
-			//Datum res[] = db.read(pos);
-			while(keySpec.compare(keySpec.createKey(res), key)==0 && !(pos>db.length())){
-				finalDatum.add(res);
-				pos+=1;
-				res = db.read(pos);
-			}
-			if(pos>db.length()){
-				int page = bucket;
-				do{
-					mf.unpin(page);
-					page = DatumSerialization.read(buffer, 0, Schema.Type.INT).toInt();
-					buffer = mf.pin(page);
-					db = new DatumBuffer(buffer,keySpec.rowSchema());
-					int pos1 = db.find(key);
-					res = db.read(pos1);
-					while(keySpec.compare(keySpec.createKey(res), key)==0 && !(pos1>db.length())){
-						finalDatum.add(res);
-						pos1+=1;
-						res = db.read(pos1);
+			while(!(DatumSerialization.read(buffer, 0, Schema.Type.INT).equals(new Datum.Int(-1)))){
+					while(!(pos>db.length())){
+						res = db.read(pos);
+						if(keySpec.compare(keySpec.createKey(res), key)==0){
+							finalDatum.add(res);
+							pos+=1;
+						}
+						else
+							return finalDatum;
 					}
-					if(keySpec.compare(keySpec.createKey(res), key)!=0)
-						break;
-				}while(!(DatumSerialization.read(buffer, 0, Schema.Type.INT).equals(new Datum.Int(-1))));
-				mf.unpin(page);
-				return finalDatum;
+					mf.unpin(tempPage);
+					tempPage = DatumSerialization.read(buffer, 0, Schema.Type.INT).toInt();
+					buffer = mf.pin(tempPage);
+					db = new DatumBuffer(buffer,keySpec.rowSchema());
+					pos = db.find(key);
+			}
+			while(!(pos>db.length())){
+				res = db.read(pos);
+				if(keySpec.compare(keySpec.createKey(res), key)==0){
+					finalDatum.add(res);
+					pos+=1;
+				}
+				else
+					break;
 			}
 			mf.unpin(tempPage);
 			return finalDatum;
