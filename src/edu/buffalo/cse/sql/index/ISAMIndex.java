@@ -351,6 +351,7 @@ public class ISAMIndex implements IndexFile {
 				}
 			}
 		}
+		file.unpin(pointer);
 		index.maxPage(pointer);
 		//changes for phase 3:ends
 		index.maxRecord(maxrecord);	
