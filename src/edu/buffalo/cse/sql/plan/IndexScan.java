@@ -13,7 +13,7 @@ public class IndexScan extends IndexScanNode {
 
 		super(objIndexScan.table,objIndexScan.schema,objIndexScan.condition);
 		this.is=objIndexScan;
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public List<Datum[]> doIndexScan(){

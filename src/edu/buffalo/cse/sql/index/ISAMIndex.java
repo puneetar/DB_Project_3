@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +24,7 @@ import edu.buffalo.cse.sql.buffer.BufferException;
 import edu.buffalo.cse.sql.buffer.ManagedFile;
 import edu.buffalo.cse.sql.buffer.FileManager;
 import edu.buffalo.cse.sql.test.TestDataStream;
+import edu.buffalo.cse.sql.util.ManageList;
 
 public class ISAMIndex implements IndexFile {
 	public static int pageNo=0;
@@ -351,7 +353,6 @@ public class ISAMIndex implements IndexFile {
 				}
 			}
 		}
-		file.unpin(pointer);
 		index.maxPage(pointer);
 		//changes for phase 3:ends
 		index.maxRecord(maxrecord);	
@@ -496,7 +497,7 @@ public class ISAMIndex implements IndexFile {
 
 	}
 
-	public Datum[] get(Datum[] key) throws SqlException, IOException
+	public List<Datum[]> get(Datum[] key) throws SqlException, IOException
 	{
 		int value=0;
 		int pageNo=file.size()-1;
@@ -560,7 +561,7 @@ public class ISAMIndex implements IndexFile {
 			}
 		}
 		file.unpin(pointer);
-		return finalRow;
+		return new ManageList().toListOfDatumArray(finalRow);
 
 	}
 

@@ -37,7 +37,7 @@ public class Expression extends ExprTree {
 		this.data=data;
 		this.schemaOfData=schema;
 		this.expr=expr;
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public Expression(OpCode op, ExprTree child,List<Datum[]> data,List<Schema.Var> schema,ExprTree expr) {
@@ -45,7 +45,7 @@ public class Expression extends ExprTree {
 		this.data=data;
 		this.schemaOfData=schema;
 		this.expr=expr;
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	public Expression(OpCode op, ExprTree lhs, ExprTree rhs,List<Datum[]> data,List<Schema.Var> schema,ExprTree expr) {
@@ -53,7 +53,7 @@ public class Expression extends ExprTree {
 		this.data=data;
 		this.schemaOfData=schema;
 		this.expr=expr;
-		// TODO Auto-generated constructor stub
+		
 	}
 
 
@@ -980,7 +980,7 @@ public class Expression extends ExprTree {
 
 			}
 		} catch (CastError e) {
-			// TODO Auto-generated catch block
+			
 			//System.out.println("***************Cast Error in Expression.compare() ");
 			e.printStackTrace();
 		}

@@ -19,12 +19,11 @@ public class PushDownSelects extends PlanRewrite{
 
 	public PushDownSelects(boolean defaultTopDown) {
 		super(defaultTopDown);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected PlanNode apply(PlanNode node) throws SqlException {
-		// TODO Auto-generated method stub
+		
 		edu.buffalo.cse.sql.plan.PlanNode.Type type=node.type;
 		switch(type){
 		case AGGREGATE:{

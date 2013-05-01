@@ -235,7 +235,7 @@ public class Sql {
 							try {
 								datum= new Datum.Int(Integer.parseInt(token));
 							} catch (NumberFormatException e) {
-								// TODO Auto-generated catch block
+								
 								//System.out.println("Not a Integer");
 								if(token.contains("#")){
 									System.out.println("contain #");
@@ -252,7 +252,7 @@ public class Sql {
 										//System.out.println("the TOKEN is :"+token);
 										datum= new Datum.Int(Integer.parseInt(token));
 									} catch (java.text.ParseException e1) {
-										// TODO Auto-generated catch block
+										
 										//e1.printStackTrace();
 										System.out.println("Contains \"-\" but not a date");
 									}
