@@ -4,8 +4,10 @@ package edu.buffalo.cse.sql.index;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import edu.buffalo.cse.sql.Schema;
 import edu.buffalo.cse.sql.SqlException;
@@ -21,7 +23,7 @@ import edu.buffalo.cse.sql.buffer.FileManager;
 import edu.buffalo.cse.sql.test.TestDataStream;
 
 public class HashIndex implements IndexFile {
-
+	//public static final int pageSize = 1024;
 	static int countPagesUsed;
 	static HashMap<Integer,DatumBuffer> hashMap=new HashMap<Integer, DatumBuffer>();
 	public ManagedFile mf;
@@ -153,8 +155,9 @@ public class HashIndex implements IndexFile {
 		throw new SqlException("Unimplemented");
 			}
 
-	public Datum[] get(Datum[] key) throws SqlException, IOException
+	public List<Datum[]> get(Datum[] key) throws SqlException, IOException
 	{
+		ArrayList<Datum[]> finalDatum = new ArrayList<Datum[]>();
 		//throw new SqlException("Unimplemented");
 		int d = 0;
 		if(key==null){
@@ -172,10 +175,35 @@ public class HashIndex implements IndexFile {
 		pos = db.find(key);
 		Datum res[] = db.read(pos);
 		if(keySpec.compare(keySpec.createKey(res), key)==0){
+			while(keySpec.compare(keySpec.createKey(res), key)==0 && !(pos>db.length())){
+				finalDatum.add(res);
+				pos+=1;
+				res = db.read(pos);
+			}
+			if(pos>db.length()){
+				int page = bucket;
+				do{
+					mf.unpin(page);
+					page = DatumSerialization.read(buffer, 0, Schema.Type.INT).toInt();
+					buffer = mf.pin(page);
+					db = new DatumBuffer(buffer,keySpec.rowSchema());
+					int pos1 = db.find(key);
+					res = db.read(pos1);
+					while(keySpec.compare(keySpec.createKey(res), key)==0 && !(pos1>db.length())){
+						finalDatum.add(res);
+						pos1+=1;
+						res = db.read(pos1);
+					}
+					if(keySpec.compare(keySpec.createKey(res), key)!=0)
+						break;
+				}while(!(DatumSerialization.read(buffer, 0, Schema.Type.INT).equals(new Datum.Int(-1))));
+				mf.unpin(page);
+				return finalDatum;
+			}
 			mf.unpin(bucket);
-			return res;
+			return finalDatum;
 		}
-		mf.pin(bucket);
+		//mf.pin(bucket);
 		int tempPage=bucket;
 		while(keySpec.compare(keySpec.createKey(res), key)!=0 && !(DatumSerialization.read(buffer, 0, Schema.Type.INT).equals(new Datum.Int(-1)))){
 			mf.unpin(tempPage);	// here or after next Line
@@ -189,15 +217,41 @@ public class HashIndex implements IndexFile {
 		if(keySpec.compare(keySpec.createKey(res), key)==0){
 			//pos = db.find(key);
 			//Datum res[] = db.read(pos);
+			while(keySpec.compare(keySpec.createKey(res), key)==0 && !(pos>db.length())){
+				finalDatum.add(res);
+				pos+=1;
+				res = db.read(pos);
+			}
+			if(pos>db.length()){
+				int page = bucket;
+				do{
+					mf.unpin(page);
+					page = DatumSerialization.read(buffer, 0, Schema.Type.INT).toInt();
+					buffer = mf.pin(page);
+					db = new DatumBuffer(buffer,keySpec.rowSchema());
+					int pos1 = db.find(key);
+					res = db.read(pos1);
+					while(keySpec.compare(keySpec.createKey(res), key)==0 && !(pos1>db.length())){
+						finalDatum.add(res);
+						pos1+=1;
+						res = db.read(pos1);
+					}
+					if(keySpec.compare(keySpec.createKey(res), key)!=0)
+						break;
+				}while(!(DatumSerialization.read(buffer, 0, Schema.Type.INT).equals(new Datum.Int(-1))));
+				mf.unpin(page);
+				return finalDatum;
+			}
 			mf.unpin(tempPage);
-			return res;
+			return finalDatum;
 		}
 		else{
 			mf.unpin(tempPage);
 			//System.out.println("Key Not Found");
 			return null;
 		}
-	}
+	}	
+}
 //	public Datum[] get(Datum[] key) throws SqlException, IOException
 //	{
 //
@@ -257,5 +311,3 @@ public class HashIndex implements IndexFile {
 //		}
 //
 //
-
-}

@@ -13,6 +13,7 @@ package edu.buffalo.cse.sql.index;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 
 import edu.buffalo.cse.sql.SqlException;
 import edu.buffalo.cse.sql.data.Datum;
@@ -31,7 +32,7 @@ public interface IndexFile {
   public IndexIterator rangeScan(Datum[] start, Datum[] end)
     throws SqlException, IOException;
 
-  public Datum[] get(Datum[] key)
+  public List<Datum[]> get(Datum[] key)
     throws SqlException, IOException;
   
 }
