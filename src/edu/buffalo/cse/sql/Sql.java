@@ -88,8 +88,8 @@ public class Sql {
 	Iterator<Schema.Var> it=list.iterator();
 	while(it.hasNext()){
 		Schema.Var sc=it.next();
-	     output.newCell(sc.name);
-		//System.out.println(sc.name+" : "+sc.rangeVariable);
+	    // output.newCell(sc.name);
+		System.out.println(sc.name+" : "+sc.rangeVariable);
 	}
 
 
