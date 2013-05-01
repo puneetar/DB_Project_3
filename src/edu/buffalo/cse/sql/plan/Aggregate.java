@@ -43,7 +43,7 @@ public class Aggregate extends AggregateNode{
 		HashMap<List<Datum>,List<Datum[]>> hmp=new HashMap<List<Datum>,List<Datum[]>>();
 		boolean bool=false;
 
-		List lsindex=new ArrayList();
+		List<Integer> lsindex=new ArrayList<Integer>();
 		while(itGroup.hasNext()){
 			bool=true;
 			g=itGroup.next();
@@ -70,7 +70,7 @@ public class Aggregate extends AggregateNode{
 			Iterator<Datum[]> it_data=dataForExp.iterator();
 			while(it_data.hasNext()){
 				Datum[] arr=it_data.next();
-				ArrayList arlsdatum= new ArrayList();
+				ArrayList<Datum> arlsdatum= new ArrayList<Datum>();
 				for( int ls=0;ls<lsindex.size();ls++){
 					Datum d=(Datum) arr[(Integer) lsindex.get(ls)];
 					arlsdatum.add(d);
