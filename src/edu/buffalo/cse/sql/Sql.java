@@ -77,20 +77,21 @@ public class Sql {
 	PlanNode newq=objPush.rewrite(q);  
 	q=newq;
 	globalData(tables,q);
-	List<Schema.Var> list=q.getSchemaVars();
-
-	Iterator<Schema.Var> it=list.iterator();
-	while(it.hasNext()){
-		Schema.Var sc=it.next();
-
-		System.out.println(sc.name+" : "+sc.rangeVariable);
-	}
-
+	
 	System.out.println("GLOBAL data made");
 	List<Datum[]> f1=Utility.switchNodes(q);
 
 
 	TableBuilder output = new TableBuilder();
+	
+	List<Schema.Var> list=q.getSchemaVars();
+	Iterator<Schema.Var> it=list.iterator();
+	while(it.hasNext()){
+		Schema.Var sc=it.next();
+	     output.newCell(sc.name);
+		//System.out.println(sc.name+" : "+sc.rangeVariable);
+	}
+
 
 	//	    for(Schema.Column c : querySchema){
 	//	      output.newCell(c.getName());

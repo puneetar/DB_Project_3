@@ -930,9 +930,9 @@ public class Expression extends ExprTree {
 
 		case VAR: {
 			ExprTree.VarLeaf vf= (ExprTree.VarLeaf)this.expr;
-			Schema.Var schema=vf.name;
-			int index=schemaOfData.indexOf(vf);
+			int index=-1;//=schemaOfData.indexOf(vf);
 
+			// I can iterate over the schemaOfData and compare it with vf with method of Schema.Var equlas().
 			Iterator<Var> it=schemaOfData.iterator();
 			int i=0;
 			while(it.hasNext()){
@@ -944,21 +944,11 @@ public class Expression extends ExprTree {
 				i++;
 			}
 
-			// I can use  .indexOf(vf) 
-			//		OR
-			// I can iterate over the schemaOfData and compare it with vf with method of Schema.Var equlas(). 
-
-			//	index=0;
-			//	System.out.println("found the Schema : "+schemaOfData.indexOf(vf));
-			//System.out.println(index);
-			String rangeVariable = vf.name.rangeVariable;
-			String name= vf.name.name;
-			//System.out.println("hell");
-			//System.out.println(data);
+			if(index==-1){
+				System.out.println("CANNOT find the Index in the Schema : in Expression.java case VAR:");
+			}
 			return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(index));
-
 		}
-		//	break;
 		default: System.out.println("Error in Expression class");
 		break;
 		}
