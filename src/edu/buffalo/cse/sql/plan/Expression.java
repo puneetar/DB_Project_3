@@ -1,18 +1,15 @@
 package edu.buffalo.cse.sql.plan;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import edu.buffalo.cse.sql.Schema;
 import edu.buffalo.cse.sql.Sql;
-import edu.buffalo.cse.sql.Schema.Type;
 import edu.buffalo.cse.sql.Schema.Var;
 import edu.buffalo.cse.sql.data.Datum;
 import edu.buffalo.cse.sql.data.Datum.CastError;
 import edu.buffalo.cse.sql.util.ManageList;
-import edu.buffalo.cse.sql.util.Utility;
 
 public class Expression extends ExprTree {
 
