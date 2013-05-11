@@ -25,7 +25,7 @@ CREATE TABLE PARTSUPP (
   suppkey int,
   availqty int,
   supplycost float,
-  comment int
+  comment string
 ) FROM FILE 'partsupp.tbl' USING TPCH('partsupp');
 
 CREATE TABLE CUSTOMER (
@@ -44,7 +44,7 @@ CREATE TABLE ORDERS (
   custkey int,
   orderstatus string,
   totalprice float,
-  orderdate date,
+  orderdate int,
   orderpriority string,
   clerk string,
   shippriority int,
@@ -62,9 +62,9 @@ CREATE TABLE LINEITEM (
   tax float,
   returnflag string,
   linestatus string,
-  shipdate date,
-  commitdate date,
-  receiptdate date,
+  shipdate int,
+  commitdate int,
+  receiptdate int,
   shipinstruct string,
   shipmode string,
   comment string

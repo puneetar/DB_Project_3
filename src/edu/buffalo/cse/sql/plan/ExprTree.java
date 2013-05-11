@@ -117,6 +117,18 @@ public class ExprTree extends ArrayList<ExprTree> {
     return this;
   }
   
+  public boolean equals(ExprTree e)
+  {
+    if(!op.equals(e.op)) { return false; }
+    return super.equals(e);
+  }
+  
+  public boolean equals(Object o)
+  {
+    try { return equals((ExprTree)o); }
+    catch(ClassCastException e) { return false; }
+  }
+  
   /**
    * An ExprTree node representing a constant value.  ExprTree nodes with opcode
    * CONST must always be of this subclass.
@@ -125,6 +137,9 @@ public class ExprTree extends ArrayList<ExprTree> {
     public Datum v; 
     public ConstLeaf(Datum v) { super(OpCode.CONST); this.v = v; }
     public String toString() { return v.toString(); }
+    public boolean equals(ExprTree e) { 
+      return super.equals(e) && v.equals(((ConstLeaf)e).v);
+    }
     
     public ConstLeaf(int i){ this(new Datum.Int(i)); }
     public ConstLeaf(float f){ this(new Datum.Flt(f)); }
@@ -145,6 +160,9 @@ public class ExprTree extends ArrayList<ExprTree> {
     public VarLeaf(String name) { this(null, name); }
     public String toString() { return name.toString(); }
     public String makeName() { return name.name; }
+    public boolean equals(ExprTree e) { 
+      return super.equals(e) && name.equals(((VarLeaf)e).name);
+    }
     
     public void allVars(Set<Schema.Var> aggSet) { aggSet.add(name); }
     

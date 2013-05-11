@@ -103,7 +103,6 @@ public class DatumBuffer {
     return DatumSerialization.read(buffer, addr(idx), schema);
   }
   
-  // it gives the number of rows
   public int length()
   {
     return addr(-1);

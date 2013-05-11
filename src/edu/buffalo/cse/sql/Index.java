@@ -2,6 +2,7 @@
 package edu.buffalo.cse.sql;
 
 import java.io.File;
+import java.util.Iterator;
 
 import edu.buffalo.cse.sql.data.Datum;
 import edu.buffalo.cse.sql.buffer.BufferManager;
@@ -19,7 +20,7 @@ public class Index {
   public enum IndexType { HASH, ISAM };
   
   public static Datum[] parseRow(String row){
-    String[] fields = row.split("/, */");
+    String[] fields = row.split(", *");
     Datum[] ret = new Datum[fields.length];
     for(int i = 0; i < ret.length; i++){
       ret[i] = new Datum.Int(Integer.parseInt(fields[i]));
@@ -100,7 +101,7 @@ public class Index {
           idx = new ISAMIndex(file, keySpec);
           break;
       }
-      IndexIterator scan;
+      Iterator<Datum[]> scan;
       if(from == null){
         if(to == null){ scan = idx.scan(); }
         else { scan = idx.rangeScanTo(to); }
@@ -117,7 +118,9 @@ public class Index {
           System.exit(-1);
         }
       } finally {
-        scan.close();
+        try {
+          ((IndexIterator)scan).close();
+        } catch(ClassCastException e) { }
       }
     } else if(get != null) {
       ManagedFile file = fm.open(idxFile);
@@ -132,7 +135,7 @@ public class Index {
       }
       
       System.out.println("Getting: "+Datum.stringOfRow(get));
-     //TODO index.java  get = idx.get(get);
+      // TODO index.java get = idx.get(get);
       System.out.println("Got: "+((get==null)?"Nothing"
                                              :Datum.stringOfRow(get)));
     

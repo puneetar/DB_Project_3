@@ -9,9 +9,9 @@ CREATE TABLE LINEITEM (
   tax float,
   returnflag string,
   linestatus string,
-  shipdate date,
-  commitdate date,
-  receiptdate date,
+  shipdate int,
+  commitdate int,
+  receiptdate int,
   shipinstruct string,
   shipmode string,
   comment string
@@ -27,5 +27,5 @@ SELECT   l.returnflag, l.linestatus,
          AVG(l.discount) AS avg_disc,
          COUNT(*) AS count_order
 FROM     LINEITEM l
-WHERE    l.shipdate <= 19981101
+WHERE    (l.shipdate <= 19981101)
 GROUP BY l.returnflag, l.linestatus;
