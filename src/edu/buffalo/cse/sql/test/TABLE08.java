@@ -47,7 +47,7 @@ public class TABLE08 extends TestHarness {
     JoinNode child_2 = new JoinNode();
     child_2.setLHS(lhs_3);
     child_2.setRHS(rhs_4);
-    SelectionNode child_1 = new SelectionNode(new ExprTree(ExprTree.OpCode.AND, new ExprTree(ExprTree.OpCode.EQ, new ExprTree.VarLeaf("R", "B"), new ExprTree.VarLeaf("S", "B")), new ExprTree(ExprTree.OpCode.LT, new ExprTree.VarLeaf("S", "C"), new ExprTree.VarLeaf("T", "C") )));
+    SelectionNode child_1 = new SelectionNode(new ExprTree(ExprTree.OpCode.AND, new ExprTree(ExprTree.OpCode.EQ, new ExprTree.VarLeaf("R", "B"), new ExprTree.VarLeaf("S", "B")), new ExprTree(ExprTree.OpCode.LT, new ExprTree.VarLeaf("S", "C"), new ExprTree.VarLeaf("T", "C"))));
     child_1.setChild(child_2);
     ProjectionNode query_0 = new ProjectionNode();
     query_0.addColumn(new ProjectionNode.Column("A", new ExprTree.VarLeaf("R", "A")));

@@ -9,9 +9,9 @@ CREATE TABLE LINEITEM (
   tax float,
   returnflag string,
   linestatus string,
-  shipdate int,
-  commitdate int,
-  receiptdate int,
+  shipdate date,
+  commitdate date,
+  receiptdate date,
   shipinstruct string,
   shipmode string,
   comment string

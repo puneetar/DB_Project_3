@@ -308,7 +308,7 @@ ExprTree UnaryExpr() :
 
 Schema.Type TypeBase() :
   { }
-  {   <TINT>     { return Schema.Type.INT; }
+  {   (<TINT>  | < DATE >)   { return Schema.Type.INT; }
     | <TFLOAT>   { return Schema.Type.FLOAT; }
     | <TSTRING>  { return Schema.Type.STRING; }
   }
@@ -356,6 +356,7 @@ TOKEN [IGNORE_CASE] : {
   | < CREATE  : "CREATE" >
   | < TABLE   : "TABLE" >
   | < TINT    : "INT" >
+  | < DATE    : "DATE" >
   | < TFLOAT  : "FLOAT" >
   | < TSTRING : "STRING" >
   | < DECIMAL : ("-")?(["0"-"9"])+ > 

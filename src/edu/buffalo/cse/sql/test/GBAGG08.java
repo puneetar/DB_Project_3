@@ -69,7 +69,7 @@ public class GBAGG08 extends TestHarness {
     child_12.setChild(child_13);
     AggregateNode child_11 = new AggregateNode();
     child_11.addGroupByVar(new ProjectionNode.Column("B", new ExprTree.VarLeaf("R", "B")));
-    child_11.addGroupByVar(new ProjectionNode.Column("DISCARD0", new ExprTree.VarLeaf("R", "B")));
+    child_11.addGroupByVar(new ProjectionNode.Column("DISCARD0", new ExprTree.VarLeaf(null, "A")));
     child_11.addGroupByVar(new ProjectionNode.Column("DISCARD1", new ExprTree.VarLeaf(null, "C")));
     child_11.addAggregate(new AggregateNode.AggColumn("Sum", new ExprTree(ExprTree.OpCode.MULT, new ExprTree.VarLeaf(null, "A"), new ExprTree.VarLeaf(null, "C")),AggregateNode.AType.SUM));
     child_11.setChild(child_12);
@@ -128,15 +128,20 @@ public class GBAGG08 extends TestHarness {
   }
   ArrayList<Datum[]> getResultsUD2() {
     ArrayList<Datum[]> ret = new ArrayList<Datum[]>();
-    ret.add(new Datum[] {new Datum.Int(4)}); 
     ret.add(new Datum[] {new Datum.Int(3)}); 
+    ret.add(new Datum[] {new Datum.Int(3)}); 
+    ret.add(new Datum[] {new Datum.Int(2)}); 
+    ret.add(new Datum[] {new Datum.Int(4)}); 
+    ret.add(new Datum[] {new Datum.Int(5)}); 
     ret.add(new Datum[] {new Datum.Int(5)}); 
     ret.add(new Datum[] {new Datum.Int(3)}); 
+    ret.add(new Datum[] {new Datum.Int(3)}); 
+    ret.add(new Datum[] {new Datum.Int(3)}); 
     ret.add(new Datum[] {new Datum.Int(4)}); 
     ret.add(new Datum[] {new Datum.Int(2)}); 
-    ret.add(new Datum[] {new Datum.Int(2)}); 
-    ret.add(new Datum[] {new Datum.Int(4)}); 
     ret.add(new Datum[] {new Datum.Int(1)}); 
+    ret.add(new Datum[] {new Datum.Int(4)}); 
+    ret.add(new Datum[] {new Datum.Int(3)}); 
     return ret;
   }
   ArrayList<Datum[]> getResultsFlipGB0() {

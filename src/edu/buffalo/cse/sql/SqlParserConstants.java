@@ -57,57 +57,59 @@ public interface SqlParserConstants {
   /** RegularExpression Id. */
   int TINT = 27;
   /** RegularExpression Id. */
-  int TFLOAT = 28;
+  int DATE = 28;
   /** RegularExpression Id. */
-  int TSTRING = 29;
+  int TFLOAT = 29;
   /** RegularExpression Id. */
-  int DECIMAL = 30;
+  int TSTRING = 30;
   /** RegularExpression Id. */
-  int FLOAT = 31;
+  int DECIMAL = 31;
   /** RegularExpression Id. */
-  int STRING = 32;
+  int FLOAT = 32;
   /** RegularExpression Id. */
-  int PERIOD = 33;
+  int STRING = 33;
   /** RegularExpression Id. */
-  int COMMA = 34;
+  int PERIOD = 34;
   /** RegularExpression Id. */
-  int EOS = 35;
+  int COMMA = 35;
   /** RegularExpression Id. */
-  int PLUS = 36;
+  int EOS = 36;
   /** RegularExpression Id. */
-  int TIMES = 37;
+  int PLUS = 37;
   /** RegularExpression Id. */
-  int MINUS = 38;
+  int TIMES = 38;
   /** RegularExpression Id. */
-  int DIVIDE = 39;
+  int MINUS = 39;
   /** RegularExpression Id. */
-  int EQ = 40;
+  int DIVIDE = 40;
   /** RegularExpression Id. */
-  int NEQ = 41;
+  int EQ = 41;
   /** RegularExpression Id. */
-  int LT = 42;
+  int NEQ = 42;
   /** RegularExpression Id. */
-  int GT = 43;
+  int LT = 43;
   /** RegularExpression Id. */
-  int LTE = 44;
+  int GT = 44;
   /** RegularExpression Id. */
-  int GTE = 45;
+  int LTE = 45;
   /** RegularExpression Id. */
-  int AND = 46;
+  int GTE = 46;
   /** RegularExpression Id. */
-  int OR = 47;
+  int AND = 47;
   /** RegularExpression Id. */
-  int NOT = 48;
+  int OR = 48;
   /** RegularExpression Id. */
-  int LPAREN = 49;
+  int NOT = 49;
   /** RegularExpression Id. */
-  int RPAREN = 50;
+  int LPAREN = 50;
   /** RegularExpression Id. */
-  int TRUE = 51;
+  int RPAREN = 51;
   /** RegularExpression Id. */
-  int FALSE = 52;
+  int TRUE = 52;
   /** RegularExpression Id. */
-  int ID = 53;
+  int FALSE = 53;
+  /** RegularExpression Id. */
+  int ID = 54;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -142,6 +144,7 @@ public interface SqlParserConstants {
     "\"CREATE\"",
     "\"TABLE\"",
     "\"INT\"",
+    "\"DATE\"",
     "\"FLOAT\"",
     "\"STRING\"",
     "<DECIMAL>",

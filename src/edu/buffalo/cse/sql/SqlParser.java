@@ -682,8 +682,20 @@ public class SqlParser implements SqlParserConstants {
   static final public Schema.Type TypeBase() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TINT:
-      jj_consume_token(TINT);
-                   {if (true) return Schema.Type.INT;}
+    case DATE:
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case TINT:
+        jj_consume_token(TINT);
+        break;
+      case DATE:
+        jj_consume_token(DATE);
+        break;
+      default:
+        jj_la1[28] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+                               {if (true) return Schema.Type.INT;}
       break;
     case TFLOAT:
       jj_consume_token(TFLOAT);
@@ -694,7 +706,7 @@ public class SqlParser implements SqlParserConstants {
                    {if (true) return Schema.Type.STRING;}
       break;
     default:
-      jj_la1[28] = jj_gen;
+      jj_la1[29] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -735,7 +747,7 @@ public class SqlParser implements SqlParserConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[29];
+  static final private int[] jj_la1 = new int[30];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -743,10 +755,10 @@ public class SqlParser implements SqlParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x2000020,0x2000020,0x300000,0x80,0x0,0x80,0x100,0x200,0x1000,0x800,0x0,0x0,0x800000,0x1000000,0x40,0x40,0x0,0x36000,0xc003e000,0x40,0x40,0x0,0x0,0x0,0x0,0x0,0x0,0xc0000000,0x38000000,};
+      jj_la1_0 = new int[] {0x2000020,0x2000020,0x300000,0x80,0x0,0x80,0x100,0x200,0x1000,0x800,0x0,0x0,0x800000,0x1000000,0x40,0x40,0x0,0x36000,0x8003e000,0x40,0x40,0x0,0x0,0x0,0x0,0x0,0x0,0x80000000,0x18000000,0x78000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x4,0x0,0x0,0x0,0x0,0x0,0x4,0x4,0x0,0x0,0x0,0x200000,0x4,0x0,0x3b0001,0x0,0x200000,0xfff0,0xfff0,0xf0,0xc000,0x3f00,0x2,0x3b0001,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x8,0x0,0x0,0x0,0x0,0x0,0x8,0x8,0x0,0x0,0x0,0x400000,0x8,0x0,0x760003,0x0,0x400000,0x1ffe0,0x1ffe0,0x1e0,0x18000,0x7e00,0x4,0x760003,0x0,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -767,7 +779,7 @@ public class SqlParser implements SqlParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -781,7 +793,7 @@ public class SqlParser implements SqlParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -798,7 +810,7 @@ public class SqlParser implements SqlParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -808,7 +820,7 @@ public class SqlParser implements SqlParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -824,7 +836,7 @@ public class SqlParser implements SqlParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -833,7 +845,7 @@ public class SqlParser implements SqlParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -884,12 +896,12 @@ public class SqlParser implements SqlParserConstants {
   /** Generate ParseException. */
   static public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[54];
+    boolean[] la1tokens = new boolean[55];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < 30; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -901,7 +913,7 @@ public class SqlParser implements SqlParserConstants {
         }
       }
     }
-    for (int i = 0; i < 54; i++) {
+    for (int i = 0; i < 55; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
