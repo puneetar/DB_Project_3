@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.buffalo.cse.sql.Schema;
+import edu.buffalo.cse.sql.Sql;
 import edu.buffalo.cse.sql.Schema.Var;
 import edu.buffalo.cse.sql.data.Datum;
 import edu.buffalo.cse.sql.data.Datum.CastError;
@@ -70,6 +71,8 @@ public class Join extends JoinNode {
 				while(iter1.hasNext()){
 					j=j+1;
 					Schema.Var var2=iter1.next();
+					if(Sql.tablemap.get(var2.rangeVariable).equals(var1.rangeVariable))
+						var1.rangeVariable=var2.rangeVariable;
 					if(var1.equals(var2)){
 						index1=j;
 						break;
@@ -81,6 +84,8 @@ public class Join extends JoinNode {
 				while(iter3.hasNext()){
 					j=j+1;
 					Schema.Var var2=iter3.next();
+					if(Sql.tablemap.get(var2.rangeVariable).equals(var1.rangeVariable))
+						var1.rangeVariable=var2.rangeVariable;
 					if(var1.equals(var2)){
 						index2=j;
 						break;

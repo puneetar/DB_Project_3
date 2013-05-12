@@ -40,13 +40,13 @@ public class PushDownSelects extends PlanRewrite{
 				case EQ:{
 					if(objSelect.getChild().type==PlanNode.Type.JOIN){
 						JoinNode jn=(JoinNode) objSelect.getChild();
-						if(jn.getJoinType()==JType.NLJ){
+						//if(jn.getJoinType()==JType.NLJ){
 
 							List ls=new Expression(exp).findColumns();
 							boolean bool=joinS(jn,ls,exp);
 							if (bool){
 								lsremove.add(exp);
-							}
+							//}
 						}
 					}
 				}
