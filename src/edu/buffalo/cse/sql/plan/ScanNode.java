@@ -27,6 +27,7 @@ public class ScanNode extends PlanNode.Leaf {
 		this.table = table; 
 		this.schema = schema.changeRangeVariable(rangeVariable);
 		this.condition=null;
+		if(!Sql.tablemap.containsKey(table))
 		Sql.tablemap.put(table, rangeVariable);
 	}
 	public ScanNode(String table, Schema.Table schema) 
@@ -89,8 +90,10 @@ public class ScanNode extends PlanNode.Leaf {
 	public void setSchemaVars(){
 		List<String> ls_col_name=new ArrayList<String>();
 		
-		if(Sql.hmp_tables_col_used.get(table)!=null)		
-		ls_col_name.addAll(Sql.hmp_tables_col_used.get(table));
+//		if(Sql.hmp_tables_col_used.get(table)!=null)		
+//		ls_col_name.addAll(Sql.hmp_tables_col_used.get(table));
+		if(Sql.hmp_tables_col_used.get(Sql.tablemap.get(table))!=null)		
+			ls_col_name.addAll(Sql.hmp_tables_col_used.get(Sql.tablemap.get(table)));
 		
 		if(Sql.hmp_tables_col_used.get("nothing")!=null)
 		ls_col_name.addAll(Sql.hmp_tables_col_used.get("nothing"));

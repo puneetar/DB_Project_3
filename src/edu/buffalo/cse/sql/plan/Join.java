@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.buffalo.cse.sql.Schema;
+import edu.buffalo.cse.sql.Sql;
 import edu.buffalo.cse.sql.Schema.Var;
 import edu.buffalo.cse.sql.data.Datum;
 import edu.buffalo.cse.sql.data.Datum.CastError;
@@ -70,6 +71,9 @@ public class Join extends JoinNode {
 				while(iter1.hasNext()){
 					j=j+1;
 					Schema.Var var2=iter1.next();
+					if(Sql.tablemap.get(var2.rangeVariable)!=null)
+					if(Sql.tablemap.get(var2.rangeVariable).equals(var1.rangeVariable))
+						var1.rangeVariable=var2.rangeVariable;
 					if(var1.equals(var2)){
 						index1=j;
 						break;
@@ -81,6 +85,9 @@ public class Join extends JoinNode {
 				while(iter3.hasNext()){
 					j=j+1;
 					Schema.Var var2=iter3.next();
+					if(Sql.tablemap.get(var2.rangeVariable)!=null)
+					if(Sql.tablemap.get(var2.rangeVariable).equals(var1.rangeVariable))
+						var1.rangeVariable=var2.rangeVariable;
 					if(var1.equals(var2)){
 						index2=j;
 						break;
@@ -99,6 +106,8 @@ public class Join extends JoinNode {
 		List<Datum[]> primary = new ArrayList<Datum[]>();
 		List<Datum[]> secondary = new ArrayList<Datum[]>();
 		List<Datum[]> lsfinalDatum = new ArrayList<Datum[]>();
+		//int r=lhs.get(0).length;
+		//int m=rhs.get(0).length;
 		if(lhs.size()<=rhs.size()){
 			primary = lhs;
 			secondary = rhs;
@@ -126,10 +135,11 @@ public class Join extends JoinNode {
 			}
 		}
 		Iterator<Datum[]> it2 = secondary.iterator();
+		//Datum[] res = new Datum[r+m];
 		while(it2.hasNext()){		
 			Datum[] row = it2.next();
-			//Datum[] res = new Datum[primary.size()+secondary.size()];
-			Datum[] res = null;
+			Datum[] res = new Datum[primary.size()+secondary.size()];
+			
 			if(hhj.containsKey(row[idx2])){
 				ArrayList<Datum[]> temp = hhj.get(row[idx2]);
 				Iterator<Datum[]> it3 = temp.iterator();
@@ -144,7 +154,8 @@ public class Join extends JoinNode {
 						lsfinalDatum.add(res);
 					}
 					else{
-						res= new Datum[row.length + matchedRow.length];
+						int s=row.length + matchedRow.length;
+						res= new Datum[s];
 						for(int k=0;k<row.length;k++)
 							res[k] = row[k];
 						for(int n=0;n<matchedRow.length;n++)
@@ -174,7 +185,7 @@ public class Join extends JoinNode {
 			lslhs=Utility.findCol(join.getLHS());
 		}
 		if(!(join.getRHS().type==PlanNode.Type.SCAN)){
-			lsrhs=Utility.findCol(join.getLHS());
+			lsrhs=Utility.findCol(join.getRHS());
 		}
 		
 //		Iterator itlhs= lslhs.iterator();

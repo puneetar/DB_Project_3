@@ -24,161 +24,162 @@
 
 package edu.buffalo.cse.sql.test;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import edu.buffalo.cse.sql.Schema;
+import edu.buffalo.cse.sql.Schema.Column;
+import edu.buffalo.cse.sql.Schema.TableFromFile;
+import edu.buffalo.cse.sql.Sql;
 import edu.buffalo.cse.sql.data.Datum;
+import edu.buffalo.cse.sql.data.Datum.Bool;
+import edu.buffalo.cse.sql.data.Datum.Flt;
+import edu.buffalo.cse.sql.data.Datum.Str;
 
 public class TestDataStream implements Iterator<Datum[]> {
-  
-  int rows;
-  int values;
-  int[] curr;
-  int chaos;
-  boolean guaranteeKeyStep;
-  Random rand;
-  
-  public TestDataStream(int keys, int values, int rows)
-  { 
-    this(keys, values, rows, keys*10, true);
-  }
 
-  public TestDataStream(int keys, int values, int rows, int chaos, 
-                        boolean guaranteeKeyStep)
-  {
-    this.rows = rows;
-    this.values = values;
-    this.curr = new int[keys];
-    this.chaos = chaos;
-    this.guaranteeKeyStep = guaranteeKeyStep; 
-    for(int i = 0; i < this.curr.length; i++){ this.curr[i] = 0; }
-    rand = new Random(52982);
-  }
-  
-  public Schema.Type[] getSchema()
-  {
-    int cols = values + curr.length;
-    Schema.Type[] sch = new Schema.Type[cols];
-    for(int i = 0; i < cols; i++){ sch[i] = Schema.Type.INT; }
-    return sch;
-  }
-  
-  public boolean validate(Iterator<Datum[]> inStream)
-  {
-    int i = 0;
-    while(hasNext()){
-      if(!inStream.hasNext()) { 
-        System.err.println("Provided stream ended early");
-        return false; 
-      }
-      i++;
-      Datum[] expected = next(), found = inStream.next();
-      if(!Datum.rowEquals(expected, found)){ 
-        System.err.println("At Row: " + i);
-        System.err.println("Expected: "+Datum.stringOfRow(expected));
-        System.err.println("Found: "+Datum.stringOfRow(found));
-        return false; 
-      }
-    }
-    if(inStream.hasNext()){
-      System.err.println("Provided stream is too long");
-      return false;
-    }
-    return true;
-  }
-  
-  public boolean validate(Iterator<Datum[]> inStream, Datum[] from, Datum[] to)
-  {
-    Datum[] expected = null, found;
-    int i = 0;
-    if(from != null){
-      while(hasNext()){
-        i++;
-        expected = next();
-        if(Datum.compareRows(from, expected) <= 0){ break; }
-      }
-    } else {
-      if(hasNext()){ expected = next(); }
-    }
-    if(expected == null){ return true; }
-    
-    while(hasNext() && ((to == null)||(Datum.compareRows(expected, to) <= 0))){
-      if(!inStream.hasNext()) { 
-        System.err.println("Provided stream ended early");
-        return false; 
-      }
-      i++;
-      found = inStream.next();
-      if(!Datum.rowEquals(expected, found)){ 
-        System.err.println("At Row: " + i);
-        System.err.println("Expected: "+Datum.stringOfRow(expected));
-        System.err.println("Found: "+Datum.stringOfRow(found));
-        return false; 
-      }
-      expected = next();
-    }
-    if(to == null){
-      if(!inStream.hasNext()) { 
-        System.err.println("Provided stream ended early");
-        return false; 
-      }
-      i++;
-      found = inStream.next();
-      if(!Datum.rowEquals(expected, found)){ 
-        System.err.println("At Row: " + i);
-        System.err.println("Expected: "+Datum.stringOfRow(expected));
-        System.err.println("Found: "+Datum.stringOfRow(found));
-        return false; 
-      }
-    }
-    if(inStream.hasNext()){
-      System.err.println("Provided stream is too long");
-      return false;
-    }
-    return true;
-  }
-  
-  protected void stepOneKey(boolean reset){
-    int tgt = rand.nextInt(curr.length);
-    curr[tgt] ++;
-    if(reset){
-      for(int i = tgt+1; i < curr.length; i++){
-        curr[i] = 0;
-      }
-    }
-  }
-  protected void stepAllKeys(){
-    boolean reset = rand.nextInt(100) >= 70;
-    int steps = rand.nextInt(chaos+1);
-    for(int i = guaranteeKeyStep ? 0 : 1; i <= steps; i++){
-      stepOneKey(reset);
-      reset = false;
-    }
-  }
-  
-  public boolean hasNext()
-  {
-    return rows > 0;
-  }
-  
-  public Datum[] next()
-  {
-    Datum[] row = new Datum[values + curr.length];
-    stepAllKeys();
-    for(int i = 0; i < row.length; i++){
-      if(i < curr.length){
-        row[i] = new Datum.Int(curr[i]);
-      } else {
-        row[i] = new Datum.Int(rand.nextInt(1000));
-      }
-    }
-    rows -= 1;
-    return row;
-  }
-  
-  public void remove()
-  {
-    throw new UnsupportedOperationException();
-  }
+	int rows;
+	int values;
+	int[] curr;
+	int chaos;
+	TableFromFile tableFromFile;
+	boolean guaranteeKeyStep;
+	Random rand;
+	List<Datum[]> lsDatum= new ArrayList<Datum[]>();
+	Map<Datum[], Datum[]> tree_lsDatum=new TreeMap<Datum[],Datum[]>();
+	Iterator<Datum[]> it_lsDatum;
+
+
+	public TestDataStream(int keys, int values, int rows)
+	{ 
+		this(null,keys, values, rows, keys*10, true);
+	}
+
+	public TestDataStream(TableFromFile tableFromFile,int noOfKeys, int values, int rows, int chaos, 
+			boolean guaranteeKeyStep)
+	{
+		this.tableFromFile= tableFromFile;
+		if(this.tableFromFile!=null){
+			try {
+				readTableFromFile();
+				it_lsDatum=lsDatum.iterator();
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		this.rows = lsDatum.size();
+		this.values = lsDatum.size() > 0 ? lsDatum.get(0).length-noOfKeys : 0;
+		this.curr = new int[noOfKeys];
+		this.chaos = chaos;
+		this.guaranteeKeyStep = guaranteeKeyStep; 
+		//		for(int i = 0; i < this.curr.length; i++){ this.curr[i] = 0; }
+		//		rand = new Random(52982);
+	}
+
+	public Schema.Type[] getSchema()
+	{
+		return tableFromFile.getSchema();
+	}
+
+	public boolean hasNext()
+	{
+		return it_lsDatum.hasNext();
+	}
+
+	public Datum[] next()
+	{
+		return it_lsDatum.next();
+	}
+
+	public int getRowCount(){
+		return lsDatum.size();
+	}
+
+	public void remove()
+	{
+		throw new UnsupportedOperationException();
+	}
+
+	private void readTableFromFile() throws NumberFormatException, IOException {
+
+
+		BufferedReader bufferedReader = new BufferedReader(new FileReader(tableFromFile.getFile()));
+
+		String data;
+		while ((data = bufferedReader.readLine()) != null){ //reading each table
+			String arrtoken[];
+
+			if(Sql.flag_TPCH==0){
+				arrtoken=data.split(",");
+			}
+			else{
+				arrtoken=data.split("\\|");
+			}
+
+			Datum[] arrdatum=new Datum[arrtoken.length];
+			for(int i=0;i<arrdatum.length;i++){ 
+
+				Datum datum=null;
+				String token=arrtoken[i];
+				Schema.Column col=tableFromFile.get(i);
+
+				switch(col.type){
+
+				case INT:
+					try {
+						datum= new Datum.Int(Integer.parseInt(token));
+					} catch (NumberFormatException e) {
+						if(token.contains("#")){
+							System.out.println("contain #");
+							token=token.substring(token.indexOf("#")+1);
+							datum= new Datum.Int(Integer.parseInt(token));
+						}
+						else if(token.contains("-")){
+							SimpleDateFormat df=new SimpleDateFormat("yyyy-mm-dd");
+							df.setLenient(false);
+							try {
+								df.parse(token);
+								token=token.replace("-","");
+								datum= new Datum.Int(Integer.parseInt(token));
+							} catch (java.text.ParseException e1) {
+								System.out.println("Contains \"-\" but not a date");
+							}
+						}
+						else
+							e.printStackTrace();
+					}
+					break;
+				case FLOAT:
+					datum= new Flt(Float.parseFloat(token));
+					break;
+				case BOOL:
+					if(token.equals("True"))
+						datum= Bool.TRUE;
+					else
+						datum=Bool.FALSE;
+					break;
+				case STRING:
+					datum= new Str(token);
+					break;
+				default:
+					break;
+				}
+				arrdatum[i]=datum;
+			}
+			lsDatum.add(arrdatum);
+		}
+		bufferedReader.close();
+	}
 }

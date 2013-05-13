@@ -33,6 +33,8 @@ public IndexScanNode(String table, String rangeVariable, Schema.Table schema,Exp
     this.table = table; 
     this.schema = schema.changeRangeVariable(rangeVariable);
     this.condition=condition;
+    if(!Sql.tablemap.containsKey(table))
+		Sql.tablemap.put(table, rangeVariable);
   }
   public IndexScanNode(String table, Schema.Table schema,ExprTree condition) 
   {

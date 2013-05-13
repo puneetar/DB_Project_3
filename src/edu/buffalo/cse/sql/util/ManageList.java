@@ -15,9 +15,9 @@ Datum[] col=m.getColumn("pass the index of the column");
 Datum[] ro=m.getRow("pass the number of desired row");
 Datum datu=m.getDatum("pass the no.of row and index of the column");
 
-***** List<Datum[]> listOfDatumArry=m.toListOfDatumArray("pass the Datum[] in this"); 
+ ***** List<Datum[]> listOfDatumArry=m.toListOfDatumArray("pass the Datum[] in this"); 
 
-*/
+ */
 
 
 import edu.buffalo.cse.sql.data.Datum;
@@ -29,7 +29,7 @@ public class ManageList {
 		this.data=data;
 
 	}
-	
+
 	public ManageList(){
 		data=null;
 	}
@@ -42,7 +42,7 @@ public class ManageList {
 		while(it_data.hasNext()){
 			ret[i++]=it_data.next()[column];
 		}
-		
+
 		return ret;
 	}
 
@@ -53,16 +53,16 @@ public class ManageList {
 	public Datum getDatum(int row, int column){
 		return (data.get(row))[column];
 	}
-	
+
 	public List<Datum[]> toListOfDatumArray(Datum[] arr){
 		ArrayList<Datum[]> ret=new ArrayList<Datum[]>();
-
+		
 		for(Datum d :arr){
 			Datum[] a=new Datum[1];
 			a[0]=d;
 			ret.add(a);
 		}
-		
+
 		return ret;
 	}
 
