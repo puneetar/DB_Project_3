@@ -197,7 +197,7 @@ HashMap<String,Integer> order():
 String schema():
 {String col = null;Token a = null; Token b = null;}
 {
-	a = <ID>{col = a.image;}(<PERIOD> b = <ID>{col = col+"."+b.image;})?
+	a = <ID>{col = a.image;}(<PERIOD> b = <ID>{col = b.image;})?
 	{return col;}
 }
 void setLimit(String i):

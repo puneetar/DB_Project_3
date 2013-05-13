@@ -353,7 +353,7 @@ public class SqlParser implements SqlParserConstants {
     case PERIOD:
       jj_consume_token(PERIOD);
       b = jj_consume_token(ID);
-                                                   col = col+"."+b.image;
+                                                   col = b.image;
       break;
     default:
       jj_la1[15] = jj_gen;
