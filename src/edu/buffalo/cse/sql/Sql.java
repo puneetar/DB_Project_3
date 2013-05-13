@@ -219,6 +219,11 @@ public class Sql {
 			}
 
 		}
+		Set sethmpindex=hmpindex.entrySet();
+		Iterator ithmpindex=sethmpindex.iterator();
+		while(ithmpindex.hasNext()){
+			//createIndex()
+		}
 		tablesIterator = tablesSet.iterator();
 
 		while(tablesIterator.hasNext()){ ///loop for each table
