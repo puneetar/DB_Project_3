@@ -32,7 +32,7 @@ public class Sql {
 	public static HashMap<String, List<Datum[]>> lsMapGlobalData= new HashMap<String, List<Datum[]>>();
 	public static HashMap<String,List<String>> hmp_tables_col_used= null;
 	public static boolean flag_hmp_tables_col_used=false;
-	private static int flag_TPCH=0;
+	public static int flag_TPCH=0;
 	public static HashMap<String,String> tablemap= new HashMap<String,String>();
 
 	public static void main( String[] args )
@@ -58,8 +58,6 @@ public class Sql {
 			}
 
 			System.out.println(output.toString());
-			//print result;
-
 		} catch (FileNotFoundException e) {
 
 			e.printStackTrace();
@@ -83,7 +81,7 @@ public class Sql {
 
 
 	TableBuilder output = new TableBuilder();
-	
+
 	List<Schema.Var> list=q.getSchemaVars();
 	Iterator<Schema.Var> it=list.iterator();
 	while(it.hasNext()){
@@ -206,7 +204,6 @@ public class Sql {
 					else{
 						lsIndex.add(index);
 					}
-
 				}
 				Iterator<Integer> ilsIndex=lsIndex.iterator();
 				//changes for Phase 3:ends
@@ -262,13 +259,13 @@ public class Sql {
 								else
 									e.printStackTrace();
 							}
-							Schema.Type t=datum.getType();
+							//Schema.Type t=datum.getType();
 							//System.out.println(t);
 						}
-						if(col.type.equals(Schema.Type.FLOAT)){
+						else if(col.type.equals(Schema.Type.FLOAT)){
 							datum= new Flt(Float.parseFloat(token));
 						}
-						if(col.type.equals(Schema.Type.BOOL)){
+						else if(col.type.equals(Schema.Type.BOOL)){
 							if(token.equals("True")){
 								datum= Bool.TRUE;
 							}
@@ -276,7 +273,7 @@ public class Sql {
 								datum=Bool.FALSE;
 							}
 						}
-						if(col.type.equals(Schema.Type.STRING)){
+						else if(col.type.equals(Schema.Type.STRING)){
 							datum= new Str(token);
 						}
 						arrdatum[j]=datum;

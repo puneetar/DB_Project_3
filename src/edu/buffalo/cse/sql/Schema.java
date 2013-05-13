@@ -15,6 +15,7 @@
 package edu.buffalo.cse.sql;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.File;
@@ -95,6 +96,16 @@ public class Schema {
         if(v.equals(c.name)) { return c; }
       }
       return null;
+    }
+    
+    public Schema.Type[] getSchema(){
+    	Schema.Type type[]=new Schema.Type[this.size()];
+    	Iterator<Column> it=this.iterator();
+    	int i=0;
+    	while(it.hasNext()){
+    		type[i++]=it.next().type;
+    	}
+    	return type;
     }
   }
   
