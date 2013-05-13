@@ -59,13 +59,10 @@ public class Sql {
 
 			System.out.println(output.toString());
 		} catch (FileNotFoundException e) {
-
 			e.printStackTrace();
 		} catch (SqlException e) {
-
 			e.printStackTrace();
 		} catch (ParseException e) {
-
 			e.printStackTrace();
 		}
 	}
