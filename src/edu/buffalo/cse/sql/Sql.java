@@ -190,36 +190,28 @@ public class Sql {
 		f1 = f;
 	else
 		f1 = f.subList(0, flag_limit);
-
-	TableBuilder output = new TableBuilder();
-
-	//UTKARSH code : end Order By && LIMIT
-
-	List<Schema.Var> list=q.getSchemaVars();
-	Iterator<Schema.Var> it=list.iterator();
-	while(it.hasNext()){
-		Schema.Var sc=it.next();
-		// output.newCell(sc.name);
-		System.out.println(sc.name+" : "+sc.rangeVariable);
-	}
-
-
-	//	    for(Schema.Column c : querySchema){
-	//	      output.newCell(c.getName());
-	//	      cols++;
-	//	    }
-	Iterator<Datum[]> resultIterator=f1.iterator();
-
-	output.addDividerLine();
-	while(resultIterator.hasNext()){
-		Datum[] row = resultIterator.next();
-		output.newRow();
-		for(Datum d : row){
-			output.newCell(d.toString());
-		}
-	}
-
-	System.out.println(output.toString());
+	//----------------UTKARSH code : end Order By && LIMIT
+	
+//	TableBuilder output = new TableBuilder();
+//	List<Schema.Var> list=q.getSchemaVars();
+//	Iterator<Schema.Var> it=list.iterator();
+//	while(it.hasNext()){
+//		Schema.Var sc=it.next();
+//		// output.newCell(sc.name);
+//		System.out.println(sc.name+" : "+sc.rangeVariable);
+//	}
+//	Iterator<Datum[]> resultIterator=f1.iterator();
+//
+//	output.addDividerLine();
+//	while(resultIterator.hasNext()){
+//		Datum[] row = resultIterator.next();
+//		output.newRow();
+//		for(Datum d : row){
+//			output.newCell(d.toString());
+//		}
+//	}
+//
+//	System.out.println(output.toString());
 	flag_hmp_tables_col_used=false;
 
 	return f1;

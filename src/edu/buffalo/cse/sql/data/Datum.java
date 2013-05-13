@@ -30,6 +30,9 @@ public abstract class Datum implements Comparator<Datum>, Comparable<Datum>{
 	public int compare(Datum arg0, Datum arg1) {
 		return arg0.compareTo(arg1);
 	}
+	 public int compare(Datum[] a, Datum[] b){
+		    return Datum.compareRows(a, b);
+		  }
 
 	public int compareTo(Datum d)
 	{
