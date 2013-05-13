@@ -106,6 +106,8 @@ public class Join extends JoinNode {
 		List<Datum[]> primary = new ArrayList<Datum[]>();
 		List<Datum[]> secondary = new ArrayList<Datum[]>();
 		List<Datum[]> lsfinalDatum = new ArrayList<Datum[]>();
+		//int r=lhs.get(0).length;
+		//int m=rhs.get(0).length;
 		if(lhs.size()<=rhs.size()){
 			primary = lhs;
 			secondary = rhs;
@@ -133,10 +135,11 @@ public class Join extends JoinNode {
 			}
 		}
 		Iterator<Datum[]> it2 = secondary.iterator();
+		//Datum[] res = new Datum[r+m];
 		while(it2.hasNext()){		
 			Datum[] row = it2.next();
-			//Datum[] res = new Datum[primary.size()+secondary.size()];
-			Datum[] res = null;
+			Datum[] res = new Datum[primary.size()+secondary.size()];
+			
 			if(hhj.containsKey(row[idx2])){
 				ArrayList<Datum[]> temp = hhj.get(row[idx2]);
 				Iterator<Datum[]> it3 = temp.iterator();
@@ -151,7 +154,8 @@ public class Join extends JoinNode {
 						lsfinalDatum.add(res);
 					}
 					else{
-						res= new Datum[row.length + matchedRow.length];
+						int s=row.length + matchedRow.length;
+						res= new Datum[s];
 						for(int k=0;k<row.length;k++)
 							res[k] = row[k];
 						for(int n=0;n<matchedRow.length;n++)
