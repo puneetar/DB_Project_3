@@ -71,6 +71,7 @@ public class Join extends JoinNode {
 				while(iter1.hasNext()){
 					j=j+1;
 					Schema.Var var2=iter1.next();
+					if(Sql.tablemap.get(var2.rangeVariable)!=null)
 					if(Sql.tablemap.get(var2.rangeVariable).equals(var1.rangeVariable))
 						var1.rangeVariable=var2.rangeVariable;
 					if(var1.equals(var2)){
@@ -84,6 +85,7 @@ public class Join extends JoinNode {
 				while(iter3.hasNext()){
 					j=j+1;
 					Schema.Var var2=iter3.next();
+					if(Sql.tablemap.get(var2.rangeVariable)!=null)
 					if(Sql.tablemap.get(var2.rangeVariable).equals(var1.rangeVariable))
 						var1.rangeVariable=var2.rangeVariable;
 					if(var1.equals(var2)){
@@ -179,7 +181,7 @@ public class Join extends JoinNode {
 			lslhs=Utility.findCol(join.getLHS());
 		}
 		if(!(join.getRHS().type==PlanNode.Type.SCAN)){
-			lsrhs=Utility.findCol(join.getLHS());
+			lsrhs=Utility.findCol(join.getRHS());
 		}
 		
 //		Iterator itlhs= lslhs.iterator();
