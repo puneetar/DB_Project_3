@@ -2,6 +2,7 @@
 package edu.buffalo.cse.sql;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -31,87 +32,184 @@ public class Index {
 		return ret;
 	}
 
-	public static void createIndex(TableFromFile tableFromFile, List<ExprTree> ls, IndexType type, int keys[],int values,
-			boolean toScan,	Datum get[], Datum from[], Datum to[]) throws Exception
-	{
-		//IndexType type = IndexType.HASH;
-		int numOfkeys = keys.length;
-		
-		int rows = 100;
-		int frames = 1024;
-		int keychaos = 2;
-		int indexSize = rows/10;
 
-		File idxFile = new File("index.dat");
+	public static void createIndex(TableFromFile tableFromFile, IndexType type, int keyCols[]) throws Exception
+	{
+		int numOfkeys = keyCols.length;
+		int frames = 100;
+
+		File idxFile = new File("index"+"_"+type+"_"+tableFromFile.getFile());
+		BufferManager bm = new BufferManager(frames);
+		FileManager fm = new FileManager(bm);
+
+		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys, 0, 0,0, true);
+		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), keyCols);
+
+		int indexSize = ds.getRowCount()/10;
+		switch(type){
+		case HASH:
+			HashIndex.create(fm, idxFile, ds, keySpec, indexSize);
+			break;
+		case ISAM:
+			ISAMIndex.create(fm, idxFile, ds, keySpec);
+			break;
+		default:
+			System.out.println("INVALID TYPE::");
+		}
+
+		ManagedFile file = fm.open(idxFile);
+	}	
+
+	public static List<Datum[]> getFromIndex(TableFromFile tableFromFile, IndexType type, int keyCols[],Datum get[]) throws Exception
+	{
+		int numOfkeys = keyCols.length;
+		int frames = 100;
+		File idxFile = new File("index"+"_"+type+"_"+tableFromFile.getFile());
+
+		if(!idxFile.exists())
+			createIndex(tableFromFile, type, keyCols);
 
 		BufferManager bm = new BufferManager(frames);
 		FileManager fm = new FileManager(bm);
 
-		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys, values, rows, keychaos, true);
-		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), keys);
+		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys,0,0,0, true);
+		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), keyCols);
 
-//		if(toScan){
-//			ManagedFile file = fm.open(idxFile);
-//			IndexFile idx = null;
-//			switch(type){
-//			case HASH:
-//				System.err.println("HASH Index scan validation unsupported");
-//				System.exit(-1);
-//				break;
-//			case ISAM:
-//				idx = new ISAMIndex(file, keySpec);
-//				break;
-//			}
-//			Iterator<Datum[]> scan;
-//			if(from == null){
-//				if(to == null){ scan = idx.scan(); }
-//				else { scan = idx.rangeScanTo(to); }
-//			} else {
-//				if(to == null){ scan = idx.rangeScanFrom(from); }
-//				else { scan = idx.rangeScan(from,to); }
-//			}
-//			try {
-//				if(ds.validate(scan, from, to)){
-//					System.out.println("Test Successful!");
-//					System.exit(0);
-//				} else {
-//					System.out.println("Test Failed!");
-//					System.exit(-1);
-//				}
-//			} finally {
-//				try {
-//					((IndexIterator)scan).close();
-//				} catch(ClassCastException e) { }
-//			}
-//		} else if(get != null) {
-//			ManagedFile file = fm.open(idxFile);
-//			IndexFile idx = null;
-//			switch(type){
-//			case HASH:
-//				idx = new HashIndex(file, keySpec);
-//				break;
-//			case ISAM:
-//				idx = new ISAMIndex(file, keySpec);
-//				break;
-//			}
-//
-//			System.out.println("Getting: "+Datum.stringOfRow(get));
-//			// TODO index.java get = idx.get(get);
-//			System.out.println("Got: "+((get==null)?"Nothing"
-//					:Datum.stringOfRow(get)));
-//
-//		} else {
-//			switch(type){
-//			case HASH:
-//				HashIndex.create(fm, idxFile, ds, keySpec, indexSize);
-//				break;
-//			case ISAM:
-//				ISAMIndex.create(fm, idxFile, ds, keySpec);
-//				break;
-//			}
-//		}
-//
-//		ManagedFile file = fm.open(idxFile);
-//
+
+		if(get != null && idxFile.exists()) {
+			ManagedFile file = fm.open(idxFile);
+			IndexFile idx = null;
+			switch(type){
+			case HASH:
+				idx = new HashIndex(file, keySpec);
+				break;
+			case ISAM:
+				idx = new ISAMIndex(file, keySpec);
+				break;
+			}
+
+			System.out.println("Getting: "+Datum.stringOfRow(get));
+			return idx.get(get);
+		}
+		return null;
 	}
+
+	public static List<Datum[]> scanFromIndex(TableFromFile tableFromFile, IndexType type, int keyCols[],Datum from[],Datum to[]) throws Exception
+	{
+		int numOfkeys = keyCols.length;
+		int frames = 100;
+
+		File idxFile = new File("index"+"_"+type+"_"+tableFromFile.getFile());
+
+		if(!idxFile.exists())
+			createIndex(tableFromFile, type, keyCols);
+
+		BufferManager bm = new BufferManager(frames);
+		FileManager fm = new FileManager(bm);
+
+		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys,0,0,0, true);
+		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), keyCols);
+
+
+		if((to != null || from !=null )&& idxFile.exists()) {
+			ManagedFile file = fm.open(idxFile);
+			IndexFile idx = null;
+			switch(type){
+			case HASH:
+				System.err.println("HASH Index scan >= <= unsupported");
+				System.exit(-1);
+				break;
+			case ISAM:
+				idx = new ISAMIndex(file, keySpec);
+				break;
+			}
+			Iterator<Datum[]> scan;
+			if(from == null){
+				if(to == null){ scan = idx.scan(); }
+				else { scan = idx.rangeScanTo(to); }
+			} else {
+				if(to == null){ scan = idx.rangeScanFrom(from); }
+				else { scan = idx.rangeScan(from,to); }
+			}
+			
+			try {
+				List <Datum[]> return_list= new ArrayList<Datum[]>();
+				while(scan.hasNext()){
+					return_list.add(scan.next());
+				}
+				return return_list;
+			} finally {
+				try {
+					((IndexIterator)scan).close();
+				} catch(ClassCastException e) { }
+			}		
+		}
+		return null;
+	}
+
+
+	//		if(toScan){
+	//			ManagedFile file = fm.open(idxFile);
+	//			IndexFile idx = null;
+	//			switch(type){
+	//			case HASH:
+	//				System.err.println("HASH Index scan validation unsupported");
+	//				System.exit(-1);
+	//				break;
+	//			case ISAM:
+	//				idx = new ISAMIndex(file, keySpec);
+	//				break;
+	//			}
+	//			Iterator<Datum[]> scan;
+	//			if(from == null){
+	//				if(to == null){ scan = idx.scan(); }
+	//				else { scan = idx.rangeScanTo(to); }
+	//			} else {
+	//				if(to == null){ scan = idx.rangeScanFrom(from); }
+	//				else { scan = idx.rangeScan(from,to); }
+	//			}
+	//			try {
+	//				if(ds.validate(scan, from, to)){
+	//					System.out.println("Test Successful!");
+	//					System.exit(0);
+	//				} else {
+	//					System.out.println("Test Failed!");
+	//					System.exit(-1);
+	//				}
+	//			} finally {
+	//				try {
+	//					((IndexIterator)scan).close();
+	//				} catch(ClassCastException e) { }
+	//			}
+	//		} else if(get != null) {
+	//			ManagedFile file = fm.open(idxFile);
+	//			IndexFile idx = null;
+	//			switch(type){
+	//			case HASH:
+	//				idx = new HashIndex(file, keySpec);
+	//				break;
+	//			case ISAM:
+	//				idx = new ISAMIndex(file, keySpec);
+	//				break;
+	//			}
+	//
+	//			System.out.println("Getting: "+Datum.stringOfRow(get));
+	//			// TODO index.java get = idx.get(get);
+	//			System.out.println("Got: "+((get==null)?"Nothing"
+	//					:Datum.stringOfRow(get)));
+	//
+	//		} else {
+	//			switch(type){
+	//			case HASH:
+	//				HashIndex.create(fm, idxFile, ds, keySpec, indexSize);
+	//				break;
+	//			case ISAM:
+	//				ISAMIndex.create(fm, idxFile, ds, keySpec);
+	//				break;
+	//			}
+	//		}
+	//
+	//		ManagedFile file = fm.open(idxFile);
+	//
+
 }

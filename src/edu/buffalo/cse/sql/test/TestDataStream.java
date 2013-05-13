@@ -63,7 +63,7 @@ public class TestDataStream implements Iterator<Datum[]> {
 		this(null,keys, values, rows, keys*10, true);
 	}
 
-	public TestDataStream(TableFromFile tableFromFile,int keys, int values, int rows, int chaos, 
+	public TestDataStream(TableFromFile tableFromFile,int noOfKeys, int values, int rows, int chaos, 
 			boolean guaranteeKeyStep)
 	{
 		this.tableFromFile= tableFromFile;
@@ -77,13 +77,13 @@ public class TestDataStream implements Iterator<Datum[]> {
 				e.printStackTrace();
 			}
 		}
-		this.rows = rows;
-		this.values = values;
-		this.curr = new int[keys];
+		this.rows = lsDatum.size();
+		this.values = lsDatum.size() > 0 ? lsDatum.get(0).length-noOfKeys : 0;
+		this.curr = new int[noOfKeys];
 		this.chaos = chaos;
 		this.guaranteeKeyStep = guaranteeKeyStep; 
-		for(int i = 0; i < this.curr.length; i++){ this.curr[i] = 0; }
-		rand = new Random(52982);
+		//		for(int i = 0; i < this.curr.length; i++){ this.curr[i] = 0; }
+		//		rand = new Random(52982);
 	}
 
 	public Schema.Type[] getSchema()
@@ -101,14 +101,18 @@ public class TestDataStream implements Iterator<Datum[]> {
 		return it_lsDatum.next();
 	}
 
+	public int getRowCount(){
+		return lsDatum.size();
+	}
+
 	public void remove()
 	{
 		throw new UnsupportedOperationException();
 	}
-	
+
 	private void readTableFromFile() throws NumberFormatException, IOException {
 
-		
+
 		BufferedReader bufferedReader = new BufferedReader(new FileReader(tableFromFile.getFile()));
 
 		String data;
@@ -121,7 +125,7 @@ public class TestDataStream implements Iterator<Datum[]> {
 			else{
 				arrtoken=data.split("\\|");
 			}
-			
+
 			Datum[] arrdatum=new Datum[arrtoken.length];
 			for(int i=0;i<arrdatum.length;i++){ 
 
@@ -169,7 +173,6 @@ public class TestDataStream implements Iterator<Datum[]> {
 					break;
 				default:
 					break;
-
 				}
 				arrdatum[i]=datum;
 			}
