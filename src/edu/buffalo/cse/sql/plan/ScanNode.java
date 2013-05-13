@@ -18,7 +18,7 @@ import edu.buffalo.cse.sql.Sql;
 public class ScanNode extends PlanNode.Leaf {
 	public final String table;
 	public final Schema.Table schema;
-	protected ExprTree condition;
+	protected List<ExprTree> condition;
 	boolean flag_setSchemaVar=false;
 	
 	public ScanNode(String table, String rangeVariable, Schema.Table schema) 
@@ -34,14 +34,14 @@ public class ScanNode extends PlanNode.Leaf {
 	{
 		this(table, table, schema);
 	}
-	public ExprTree getCondition() {
+	public List<ExprTree> getCondition() {
 //		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
 //			setSchemaVars();
 //			flag_setSchemaVar=true;
 //		}
 		return condition;
 	}
-	public void setCondition(ExprTree condition) {
+	public void setCondition(List<ExprTree> condition) {
 //		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
 //			setSchemaVars();
 //			flag_setSchemaVar=true;

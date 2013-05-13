@@ -9,7 +9,7 @@ import edu.buffalo.cse.sql.data.Datum.CastError;
 import edu.buffalo.cse.sql.util.Utility;
 
 public class Union extends UnionNode{
-	UnionNode unode;
+	public UnionNode unode;
 	public Union(UnionNode unode){
 		this.unode=unode;
 	}

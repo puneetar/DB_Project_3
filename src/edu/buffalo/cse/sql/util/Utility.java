@@ -1,6 +1,7 @@
 package edu.buffalo.cse.sql.util;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.buffalo.cse.sql.Schema.Column;
@@ -8,6 +9,7 @@ import edu.buffalo.cse.sql.data.Datum;
 import edu.buffalo.cse.sql.data.Datum.CastError;
 import edu.buffalo.cse.sql.plan.Aggregate;
 import edu.buffalo.cse.sql.plan.AggregateNode;
+import edu.buffalo.cse.sql.plan.ExprTree;
 import edu.buffalo.cse.sql.plan.IndexScan;
 import edu.buffalo.cse.sql.plan.IndexScanNode;
 import edu.buffalo.cse.sql.plan.Join;
@@ -118,8 +120,54 @@ public class Utility {
 		return col;
 	}
 	
-	public static void breakSelect(SelectionNode q){
-		//q.conjunctiveClauses();
+	public static List<ExprTree> findIndexNodes(PlanNode node){
+	
+		
+		
+		Type type= node.type;
+	
+		List col=new ArrayList();
+		List<ExprTree> ls= new ArrayList();
+		switch(type){
+		case PROJECT:{
+			Project objProject= new Project((ProjectionNode)node);
+			ls=findIndexNodes(objProject.pnode.getChild());
+			break;
+		}
+		case SELECT:{
+			Select objSelect= new Select((SelectionNode)node);
+			ls=findIndexNodes(objSelect.s.getChild());
+			break;
+		}
+		case AGGREGATE:{
+			Aggregate objAggregate= new Aggregate((AggregateNode)node);
+			PlanNode node1=objAggregate.a.getChild();
+			ls=Utility.findIndexNodes(node1);
+			break;
+		}
+		case JOIN:{
+			Join objJoin= new Join((JoinNode)node);
+			List<ExprTree> ls1=findIndexNodes(objJoin.join.getLHS());
+			List<ExprTree> ls2=findIndexNodes(objJoin.join.getRHS());
+			ls1.addAll(ls2);
+			ls=ls1;
+			break;
+		}
+		case UNION:{
+			Union objUnion= new Union((UnionNode)node);
+			List<ExprTree> ls1=findIndexNodes(objUnion.unode.getLHS());
+			List<ExprTree> ls2=findIndexNodes(objUnion.unode.getRHS());
+			ls1.addAll(ls2);
+			ls=ls1;
+			break;
+		}
+		case INDEXSCAN:{
+			IndexScan objIndexScan=new IndexScan((IndexScanNode)node);
+			ls=objIndexScan.getCondition();
+			
+			break;
+		}
+		}
+		return ls;
 	}
-
 }

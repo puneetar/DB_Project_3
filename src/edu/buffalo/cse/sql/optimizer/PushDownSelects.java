@@ -1,5 +1,6 @@
 package edu.buffalo.cse.sql.optimizer;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import edu.buffalo.cse.sql.Schema;
@@ -129,6 +130,7 @@ public class PushDownSelects extends PlanRewrite{
 		case SCAN:{
 			ScanNode objScan=(ScanNode)node;
 			if(objScan.getCondition()!=null&& !objScan.getCondition().isEmpty() ){
+			
 				IndexScanNode objindex=new IndexScanNode(objScan.table, objScan.schema,objScan.getCondition());
 				node=objindex ;
 			}
@@ -269,7 +271,14 @@ public class PushDownSelects extends PlanRewrite{
 			while(it.hasNext()){
 				Var v= it.next();
 				if(v.equals(v1)){
-					objScan.setCondition(exp);
+					List lscond= objScan.getCondition();
+					if(lscond!=null && !lscond.isEmpty())
+						lscond.add(exp);
+					else{
+						lscond=new ArrayList();
+						lscond.add(exp);
+					}
+					objScan.setCondition(lscond);
 					bool=true;
 				}
 			}				

@@ -23,14 +23,19 @@ public class IndexScan extends IndexScanNode {
 	}
 	public List findcolumns(){
 		//pnode.getColumns();
-		ExprTree cond = is.condition;
+		List<ExprTree> lscond = is.condition;
 		List ls=new ArrayList();
-		if(cond!=null && !cond.isEmpty()){
+		//if(cond!=null && !cond.isEmpty()){
+		if(lscond.size()!=0){
+			Iterator itcond= lscond.iterator();
+			while(itcond.hasNext()){
+				ExprTree cond=(ExprTree) itcond.next();
 			List ls1=new Expression(cond).findColumns();
 			Iterator lsit= ls1.iterator();
 			while(lsit.hasNext()){
 				ls.add(lsit.next());
 			}
+		}
 		}
 		return ls;
 	}

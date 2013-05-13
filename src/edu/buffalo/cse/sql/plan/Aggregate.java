@@ -19,7 +19,7 @@ import edu.buffalo.cse.sql.plan.ProjectionNode.Column;
 import edu.buffalo.cse.sql.util.Utility;
 
 public class Aggregate extends AggregateNode{
-	AggregateNode a;
+	public AggregateNode a;
 	List<Datum[]> dataForExp=new ArrayList<Datum[]>();
 	List<Schema.Var> schemaForExp = new ArrayList<Schema.Var>();
 

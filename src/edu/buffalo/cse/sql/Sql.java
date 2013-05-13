@@ -16,6 +16,7 @@ import java.text.*;
 
 import edu.buffalo.cse.sql.Schema;
 import edu.buffalo.cse.sql.Schema.Column;
+import edu.buffalo.cse.sql.Schema.Var;
 import edu.buffalo.cse.sql.data.Datum;
 import edu.buffalo.cse.sql.data.Datum.Bool;
 import edu.buffalo.cse.sql.data.Datum.Flt;
@@ -24,6 +25,7 @@ import edu.buffalo.cse.sql.data.Datum.Str;
 import edu.buffalo.cse.sql.optimizer.PlanRewrite;
 import edu.buffalo.cse.sql.optimizer.PushDownSelects;
 import edu.buffalo.cse.sql.plan.ExprTree;
+import edu.buffalo.cse.sql.plan.Expression;
 import edu.buffalo.cse.sql.plan.ExprTree.VarLeaf;
 import edu.buffalo.cse.sql.plan.PlanNode;
 import edu.buffalo.cse.sql.util.*;
@@ -72,7 +74,7 @@ public class Sql {
 	PlanNode newq=objPush.rewrite(q);  
 	q=newq;
 	globalData(tables,q);
-	
+
 	System.out.println("GLOBAL data made");
 	List<Datum[]> f1=Utility.switchNodes(q);
 
@@ -83,7 +85,7 @@ public class Sql {
 	Iterator<Schema.Var> it=list.iterator();
 	while(it.hasNext()){
 		Schema.Var sc=it.next();
-	    // output.newCell(sc.name);
+		// output.newCell(sc.name);
 		System.out.println(sc.name+" : "+sc.rangeVariable);
 	}
 
@@ -172,8 +174,53 @@ public class Sql {
 
 		hmp_tables_col_used=hmp;
 		flag_hmp_tables_col_used=true;
-
+		List<ExprTree> lsnodes=Utility.findIndexNodes(q);
 		//changes for Phase 3: ends
+		HashMap<String,int[]> hmpindex= new HashMap<String,int[]>();
+		while(tablesIterator.hasNext()){
+			Map.Entry tableEntry1 = (Map.Entry) tablesIterator.next();
+			String tablename1=(String) tableEntry1.getKey();
+			Schema.TableFromFile tf=(Schema.TableFromFile)tableEntry1.getValue();
+			List<Schema.Column> lscolumn1= ((Schema.TableFromFile)tableEntry1.getValue());
+			String t=Sql.tablemap.get(tablename1);
+			Iterator itrnodes=lsnodes.iterator();
+			List<Integer> lsIndex= new ArrayList<Integer>();
+			while(itrnodes.hasNext()){
+				ExprTree exp=(ExprTree) itrnodes.next();
+				List ls1=new Expression(exp).findColumns();
+				ExprTree.VarLeaf vf= (ExprTree.VarLeaf)ls1.get(0);
+				if(t!=null){
+					if(t.equals(vf.name.rangeVariable)){
+						int index1=-1;
+						Iterator<Column> it=lscolumn1.iterator();
+
+						while(it.hasNext()){
+							index1=index1+1;
+							Schema.Column column=(Column) it.next();
+							if(column.name.equals(vf.name))
+								if(!lsIndex.contains(index1))
+								lsIndex.add(index1);
+						}
+
+					}
+				}
+
+			}
+			if(lsIndex.size()!=0){
+				Iterator itindex= lsIndex.iterator();
+				int[] arr=new int[lsIndex.size()];
+				int k=0;
+				while(itindex.hasNext()){
+					int i=(Integer) itindex.next();
+					arr[k]=i;
+					k=k+1;
+				}
+				hmpindex.put(tablename1, arr);
+			}
+
+		}
+		tablesIterator = tablesSet.iterator();
+
 		while(tablesIterator.hasNext()){ ///loop for each table
 			BufferedReader bufferedReader = null;
 			String data=null;
@@ -230,7 +277,7 @@ public class Sql {
 							try {
 								datum= new Datum.Int(Integer.parseInt(token));
 							} catch (NumberFormatException e) {
-								
+
 								//System.out.println("Not a Integer");
 								if(token.contains("#")){
 									System.out.println("contain #");
@@ -247,7 +294,7 @@ public class Sql {
 										//System.out.println("the TOKEN is :"+token);
 										datum= new Datum.Int(Integer.parseInt(token));
 									} catch (java.text.ParseException e1) {
-										
+
 										//e1.printStackTrace();
 										System.out.println("Contains \"-\" but not a date");
 									}

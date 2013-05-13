@@ -12,7 +12,7 @@ import edu.buffalo.cse.sql.util.ManageList;
 import edu.buffalo.cse.sql.util.Utility;
 
 public class Project extends ProjectionNode {
-	ProjectionNode pnode;
+	public ProjectionNode pnode;
 	List<Datum[]> dataForExp=new ArrayList<Datum[]>();
 	List<Schema.Var> schemaForExp = new ArrayList<Schema.Var>();
 	

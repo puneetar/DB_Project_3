@@ -18,16 +18,16 @@ import edu.buffalo.cse.sql.Sql;
 public class IndexScanNode extends PlanNode.Leaf {
   public final String table;
   public final Schema.Table schema;
-  public ExprTree condition;
+  public List<ExprTree> condition;
   boolean flag_setSchemaVar=false;
   
-  public ExprTree getCondition() {
+  public List<ExprTree> getCondition() {
 	return condition;
 }
-public void setCondition(ExprTree condition) {
+public void setCondition(List<ExprTree> condition) {
 	this.condition = condition;
 }
-public IndexScanNode(String table, String rangeVariable, Schema.Table schema,ExprTree condition) 
+public IndexScanNode(String table, String rangeVariable, Schema.Table schema,List<ExprTree> condition) 
   { 
     super(PlanNode.Type.INDEXSCAN); 
     this.table = table; 
@@ -36,7 +36,7 @@ public IndexScanNode(String table, String rangeVariable, Schema.Table schema,Exp
     if(!Sql.tablemap.containsKey(table))
 		Sql.tablemap.put(table, rangeVariable);
   }
-  public IndexScanNode(String table, Schema.Table schema,ExprTree condition) 
+  public IndexScanNode(String table, Schema.Table schema,List<ExprTree> condition) 
   {
     this(table, table, schema,condition);
   }

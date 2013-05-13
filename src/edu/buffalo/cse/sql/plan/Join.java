@@ -14,7 +14,7 @@ import edu.buffalo.cse.sql.plan.ExprTree.VarLeaf;
 import edu.buffalo.cse.sql.util.Utility;
 
 public class Join extends JoinNode {
-	JoinNode join;
+	public JoinNode join;
 
 	public Join(JoinNode join){
 		super();

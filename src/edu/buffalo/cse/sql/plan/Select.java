@@ -10,7 +10,7 @@ import edu.buffalo.cse.sql.data.Datum.CastError;
 import edu.buffalo.cse.sql.util.Utility;
 
 public class Select extends SelectionNode{
-	SelectionNode s;
+	public SelectionNode s;
 	List<Datum[]> dataForExp=new ArrayList<Datum[]>();
 	List<Schema.Var> schemaForExp = new ArrayList<Schema.Var>();
 
