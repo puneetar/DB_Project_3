@@ -934,6 +934,7 @@ public class Expression extends ExprTree {
 			int i=0;
 			while(it.hasNext()){
 				Schema.Var var1=it.next();
+				if(Sql.tablemap.get(var1.rangeVariable)!=null)
 				if(Sql.tablemap.get(var1.rangeVariable).equals(vf.name.rangeVariable))
 					vf.name.rangeVariable=var1.rangeVariable;
 				if(var1.equals(vf.name))
