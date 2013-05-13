@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Iterator;
+import java.util.TreeMap;
 
 import edu.buffalo.cse.sql.Schema;
 import edu.buffalo.cse.sql.Schema.Column;
@@ -55,6 +56,7 @@ public class TestDataStream implements Iterator<Datum[]> {
 	boolean guaranteeKeyStep;
 	Random rand;
 	List<Datum[]> lsDatum= new ArrayList<Datum[]>();
+	Map<Datum[], Datum[]> tree_lsDatum=new TreeMap<Datum[],Datum[]>();
 	Iterator<Datum[]> it_lsDatum;
 
 
