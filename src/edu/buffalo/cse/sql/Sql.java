@@ -90,6 +90,8 @@ public class Sql {
 	List<Datum[]> f = new ArrayList<Datum[]>();
 
 	System.out.println("GLOBAL data made");
+
+	///Utkarsh code : Order By
 	List<Datum[]> temp=Utility.switchNodes(q);
 	if(orderByMap.isEmpty()){
 		f = temp;
@@ -158,19 +160,30 @@ public class Sql {
 				j++;
 			}
 			Map<Datum,ArrayList<Datum[]>> tm1 = new TreeMap<Datum,ArrayList<Datum[]>>();
-			Map<Datum,ArrayList<Datum[]>> finalMap = new TreeMap<Datum,ArrayList<Datum[]>>();
+			Map<Datum,ArrayList<Datum[]>> finalMapinc = new TreeMap<Datum,ArrayList<Datum[]>>();
+			Map<Datum,ArrayList<Datum[]>> finalMapdec = new TreeMap<Datum,ArrayList<Datum[]>>(Collections.reverseOrder());
 			for(Map.Entry<Datum,ArrayList<Datum[]>> entry : globalMap.entrySet()){
 				ArrayList<Datum[]> al = entry.getValue();
+				ArrayList<Datum[]> newDatumList = new ArrayList<Datum[]>();
 				if(al.size()>1){
 					tm1 = sortIncreasing(al,j);
-					ArrayList<Datum[]> newDatumList = prepare(tm1);
-					finalMap.put(entry.getKey(), newDatumList);
+					newDatumList = prepare(tm1);
+					if(orderByMap.get(col1)==1)
+						finalMapdec.put(entry.getKey(), newDatumList);
+					else
+						finalMapinc.put(entry.getKey(), newDatumList);
 				}
 				else{
-					finalMap.put(entry.getKey(), al);
+					if(orderByMap.get(col1)==1)
+						finalMapdec.put(entry.getKey(), newDatumList);
+					else
+						finalMapinc.put(entry.getKey(), newDatumList);
 				}
 			}
-			f = prepare(finalMap);
+			if(orderByMap.get(col1)==1)
+				f = prepare(finalMapdec);
+			else
+				f = prepare(finalMapinc);
 		}
 	}
 	if(flag_limit==0)
@@ -179,6 +192,8 @@ public class Sql {
 		f1 = f.subList(0, flag_limit);
 
 	TableBuilder output = new TableBuilder();
+
+	//UTKARSH code : end Order By && LIMIT
 
 	List<Schema.Var> list=q.getSchemaVars();
 	Iterator<Schema.Var> it=list.iterator();
@@ -231,67 +246,7 @@ public class Sql {
 		System.out.println("flag TPCH is set =1");
 		flag_TPCH=1;
 	}
-	
-	public static void setLimit(int lim){
-		flag_limit = lim;
-	}
-	
-	public static void setOrderMap(HashMap<String,Integer> map){
-		orderByMap = map;
-	}
 
-	public static void setOrderList(List<String> list){
-		orderByList = list;
-	}
-	
-	public static Map<Datum, ArrayList<Datum[]>> sortIncreasing(List<Datum[]> temp,int i){
-		Map<Datum,ArrayList<Datum[]>> tm = new TreeMap<Datum,ArrayList<Datum[]>>();
-		Iterator<Datum[]> it1 = temp.iterator();
-		while(it1.hasNext()){
-			Datum[] d = it1.next();
-			if(tm.containsKey(d[i])){
-				ArrayList<Datum[]> l = tm.get(d[i]);
-				l.add(d);
-			}
-			else{
-				ArrayList<Datum[]> l = new ArrayList<Datum[]>();
-				l.add(d);
-				tm.put(d[i], l);
-			}
-		}
-		return tm;
-	}
-	
-	public static Map<Datum, ArrayList<Datum[]>> sortDecreasing(List<Datum[]> temp,int i){
-		Map<Datum,ArrayList<Datum[]>> tm = new TreeMap<Datum,ArrayList<Datum[]>>(Collections.reverseOrder());
-		Iterator<Datum[]> it1 = temp.iterator();
-		while(it1.hasNext()){
-			Datum[] d = it1.next();
-			if(tm.containsKey(d[i])){
-				ArrayList<Datum[]> l = tm.get(d[i]);
-				l.add(d);
-			}
-			else{
-				ArrayList<Datum[]> l = new ArrayList<Datum[]>();
-				l.add(d);
-				tm.put(d[i], l);
-			}
-		}
-		return tm;
-	}
-	
-	public static ArrayList<Datum[]> prepare(Map<Datum,ArrayList<Datum[]>> tm){
-		ArrayList<Datum[]> f = new ArrayList<Datum[]>();
-		for(Map.Entry<Datum,ArrayList<Datum[]>> entry : tm.entrySet()){
-			ArrayList<Datum[]> l = entry.getValue();
-			Iterator<Datum[]> it2 = l.iterator();
-			while(it2.hasNext()){
-				Datum[] lDatum = it2.next();
-				f.add(lDatum);
-			}
-		}
-		return f;
-	}
 	public static  void globalData(Map<String, Schema.TableFromFile> tables,PlanNode q) throws SqlException{
 		Set tablesSet = tables.entrySet();
 		Iterator tablesIterator = tablesSet.iterator();
@@ -358,7 +313,7 @@ public class Sql {
 							Schema.Column column=(Column) it.next();
 							if(column.name.equals(vf.name))
 								if(!lsIndex.contains(index1))
-								lsIndex.add(index1);
+									lsIndex.add(index1);
 						}
 
 					}
@@ -389,7 +344,7 @@ public class Sql {
 		Index objIndex= new Index();
 		while(ithmpindex.hasNext()){
 			Map.Entry ent=(Entry) ithmpindex.next();
-			
+
 		}
 		tablesIterator = tablesSet.iterator();
 
@@ -544,12 +499,77 @@ public class Sql {
 		return bool;
 	}
 	//changes for Phase 3:ends
+
 	public static IndexType findType(ExprTree.OpCode op){
 		if( op.equals(OpCode.EQ)){
 			return IndexType.HASH;
 		}
 		else
 			return IndexType.ISAM;
-			
+	}		
+
+
+
+	//UTKARSK methods : for Order BY && LIMIT
+	public static void setLimit(int lim){
+		flag_limit = lim;
+	}
+
+	public static void setOrderMap(HashMap<String,Integer> map){
+		orderByMap = map;
+	}
+
+	public static void setOrderList(List<String> list){
+		orderByList = list;
+	}
+
+	public static Map<Datum, ArrayList<Datum[]>> sortIncreasing(List<Datum[]> temp,int i){
+		Map<Datum,ArrayList<Datum[]>> tm = new TreeMap<Datum,ArrayList<Datum[]>>();
+		Iterator<Datum[]> it1 = temp.iterator();
+		while(it1.hasNext()){
+			Datum[] d = it1.next();
+			if(tm.containsKey(d[i])){
+				ArrayList<Datum[]> l = tm.get(d[i]);
+				l.add(d);
+			}
+			else{
+				ArrayList<Datum[]> l = new ArrayList<Datum[]>();
+				l.add(d);
+				tm.put(d[i], l);
+			}
+		}
+		return tm;
+	}
+
+	public static Map<Datum, ArrayList<Datum[]>> sortDecreasing(List<Datum[]> temp,int i){
+		Map<Datum,ArrayList<Datum[]>> tm = new TreeMap<Datum,ArrayList<Datum[]>>(Collections.reverseOrder());
+		Iterator<Datum[]> it1 = temp.iterator();
+		while(it1.hasNext()){
+			Datum[] d = it1.next();
+			if(tm.containsKey(d[i])){
+				ArrayList<Datum[]> l = tm.get(d[i]);
+				l.add(d);
+			}
+			else{
+				ArrayList<Datum[]> l = new ArrayList<Datum[]>();
+				l.add(d);
+				tm.put(d[i], l);
+			}
+		}
+		return tm;
+	}
+
+	public static ArrayList<Datum[]> prepare(Map<Datum,ArrayList<Datum[]>> tm){
+		ArrayList<Datum[]> f = new ArrayList<Datum[]>();
+		for(Map.Entry<Datum,ArrayList<Datum[]>> entry : tm.entrySet()){
+			ArrayList<Datum[]> l = entry.getValue();
+			Iterator<Datum[]> it2 = l.iterator();
+			while(it2.hasNext()){
+				Datum[] lDatum = it2.next();
+				f.add(lDatum);
+			}
+		}
+		return f;
+
 	}
 }
