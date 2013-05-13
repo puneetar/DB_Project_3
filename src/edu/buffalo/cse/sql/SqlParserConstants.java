@@ -25,91 +25,97 @@ public interface SqlParserConstants {
   /** RegularExpression Id. */
   int UNION = 11;
   /** RegularExpression Id. */
-  int ALL = 12;
+  int LIMIT = 12;
   /** RegularExpression Id. */
-  int SUM = 13;
+  int ORDER = 13;
   /** RegularExpression Id. */
-  int AVG = 14;
+  int DESC = 14;
   /** RegularExpression Id. */
-  int COUNT = 15;
+  int ALL = 15;
   /** RegularExpression Id. */
-  int MIN = 16;
+  int SUM = 16;
   /** RegularExpression Id. */
-  int MAX = 17;
+  int AVG = 17;
   /** RegularExpression Id. */
-  int FILE = 18;
+  int COUNT = 18;
   /** RegularExpression Id. */
-  int USING = 19;
+  int MIN = 19;
   /** RegularExpression Id. */
-  int CSV = 20;
+  int MAX = 20;
   /** RegularExpression Id. */
-  int TPCH = 21;
+  int FILE = 21;
   /** RegularExpression Id. */
-  int NATURAL = 22;
+  int USING = 22;
   /** RegularExpression Id. */
-  int JOIN = 23;
+  int CSV = 23;
   /** RegularExpression Id. */
-  int ON = 24;
+  int TPCH = 24;
   /** RegularExpression Id. */
-  int CREATE = 25;
+  int NATURAL = 25;
   /** RegularExpression Id. */
-  int TABLE = 26;
+  int JOIN = 26;
   /** RegularExpression Id. */
-  int TINT = 27;
+  int ON = 27;
   /** RegularExpression Id. */
-  int DATE = 28;
+  int CREATE = 28;
   /** RegularExpression Id. */
-  int TFLOAT = 29;
+  int TABLE = 29;
   /** RegularExpression Id. */
-  int TSTRING = 30;
+  int TINT = 30;
   /** RegularExpression Id. */
-  int DECIMAL = 31;
+  int DATE = 31;
   /** RegularExpression Id. */
-  int FLOAT = 32;
+  int TFLOAT = 32;
   /** RegularExpression Id. */
-  int STRING = 33;
+  int TSTRING = 33;
   /** RegularExpression Id. */
-  int PERIOD = 34;
+  int DECIMAL = 34;
   /** RegularExpression Id. */
-  int COMMA = 35;
+  int FLOAT = 35;
   /** RegularExpression Id. */
-  int EOS = 36;
+  int STRING = 36;
   /** RegularExpression Id. */
-  int PLUS = 37;
+  int PERIOD = 37;
   /** RegularExpression Id. */
-  int TIMES = 38;
+  int COMMA = 38;
   /** RegularExpression Id. */
-  int MINUS = 39;
+  int EOS = 39;
   /** RegularExpression Id. */
-  int DIVIDE = 40;
+  int PLUS = 40;
   /** RegularExpression Id. */
-  int EQ = 41;
+  int TIMES = 41;
   /** RegularExpression Id. */
-  int NEQ = 42;
+  int MINUS = 42;
   /** RegularExpression Id. */
-  int LT = 43;
+  int DIVIDE = 43;
   /** RegularExpression Id. */
-  int GT = 44;
+  int EQ = 44;
   /** RegularExpression Id. */
-  int LTE = 45;
+  int NEQ = 45;
   /** RegularExpression Id. */
-  int GTE = 46;
+  int LT = 46;
   /** RegularExpression Id. */
-  int AND = 47;
+  int GT = 47;
   /** RegularExpression Id. */
-  int OR = 48;
+  int LTE = 48;
   /** RegularExpression Id. */
-  int NOT = 49;
+  int GTE = 49;
   /** RegularExpression Id. */
-  int LPAREN = 50;
+  int AND = 50;
   /** RegularExpression Id. */
-  int RPAREN = 51;
+  int OR = 51;
   /** RegularExpression Id. */
-  int TRUE = 52;
+  int NOT = 52;
   /** RegularExpression Id. */
-  int FALSE = 53;
+  int LPAREN = 53;
   /** RegularExpression Id. */
-  int ID = 54;
+  int RPAREN = 54;
+  /** RegularExpression Id. */
+  int TRUE = 55;
+  /** RegularExpression Id. */
+  int FALSE = 56;
+  /** RegularExpression Id. */
+  int ID = 57;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -128,6 +134,9 @@ public interface SqlParserConstants {
     "\"GROUP\"",
     "\"BY\"",
     "\"UNION\"",
+    "\"LIMIT\"",
+    "\"ORDER\"",
+    "\"DESC\"",
     "\"ALL\"",
     "\"SUM\"",
     "\"AVG\"",

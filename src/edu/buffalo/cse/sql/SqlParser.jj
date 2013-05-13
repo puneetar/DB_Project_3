@@ -4,6 +4,7 @@ package edu.buffalo.cse.sql;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -104,11 +105,13 @@ Schema.Column ColSchema() :
 PlanNode Select(Program p, String rangeVariable) : 
   {
     List<Target> tgtList;
+    HashMap<String,Integer> map = new HashMap<String,Integer>();
     PlanNode source = new NullSourceNode(1);
     ExprTree where = null;
     PlanNode unionRHS = null;
     Token unionAll = null;
     List<ExprTree> gbList = null;
+    Token limit = null;
   }
   {
     <SELECT> tgtList = SelectTargetList()
@@ -116,6 +119,8 @@ PlanNode Select(Program p, String rangeVariable) :
       ( <WHERE> where = Expr() { source =SelectionNode.make(source, where); } )?
       ( <GROUP> <BY> gbList = GroupByList() )?
       ( <UNION> (unionAll = <ALL>)? unionRHS = Select(p, rangeVariable) )?
+      ( <ORDER> <BY> map = order(){Sql.setOrderMap(map);})?
+      ( <LIMIT> limit = <DECIMAL> { setLimit(limit.image); })?
     { 
       ArrayList<ProjectionNode.Column> pTgtList 
                     = new ArrayList<ProjectionNode.Column>();
@@ -180,6 +185,27 @@ PlanNode Select(Program p, String rangeVariable) :
     }
   }
 
+HashMap<String,Integer> order():
+{
+	String column; HashMap<String,Integer> hm = new HashMap<String,Integer>();
+	ArrayList<String> list = new ArrayList<String>();
+}
+{
+	column = schema(){hm.put(column,0);list.add(column);}(<DESC>{hm.put(column,1);})?(<COMMA> column = schema(){hm.put(column,0);list.add(column);}(<DESC>{hm.put(column,1);})?)*
+	{Sql.setOrderList(list);return hm;}
+}
+String schema():
+{String col = null;Token a = null; Token b = null;}
+{
+	a = <ID>{col = a.image;}(<PERIOD> b = <ID>{col = col+"."+b.image;})?
+	{return col;}
+}
+void setLimit(String i):
+{}
+{
+	{Sql.setLimit(Integer.parseInt(i));}
+}
+
 List<ExprTree> GroupByList() :
   { List<ExprTree> ret = new ArrayList<ExprTree>();
     ExprTree col; }
@@ -234,6 +260,7 @@ List<Target> SelectTargetList() :
     )* 
     { return tgtList; }
   }
+  
 
 Target SelectTarget() :
   { ExprTree e; Token id = null; String name; AggregateNode.AType agg = null; }
@@ -340,6 +367,9 @@ TOKEN [IGNORE_CASE] : {
   | < GROUP   : "GROUP" >
   | < BY      : "BY" >
   | < UNION   : "UNION" >
+  | < LIMIT	  : "LIMIT" >
+  | < ORDER   : "ORDER" >
+  | < DESC    : "DESC" >
   | < ALL     : "ALL" >
   | < SUM     : "SUM" >
   | < AVG     : "AVG" >
