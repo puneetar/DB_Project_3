@@ -51,28 +51,33 @@ public class TestDataStream implements Iterator<Datum[]> {
 	int rows;
 	int values;
 	int[] curr;
+	int[] keyCols;
 	int chaos;
 	TableFromFile tableFromFile;
 	boolean guaranteeKeyStep;
 	Random rand;
+	
 	List<Datum[]> lsDatum= new ArrayList<Datum[]>();
-	Map<Datum[], Datum[]> tree_lsDatum=new TreeMap<Datum[],Datum[]>();
 	Iterator<Datum[]> it_lsDatum;
+	
+	Map<Datum[], Datum[]> tree_lsDatum=new TreeMap<Datum[],Datum[]>();
+	Iterator<Datum[]> it_tree_lsDatum;
 
 
 	public TestDataStream(int keys, int values, int rows)
 	{ 
-		this(null,keys, values, rows, keys*10, true);
+		this(null,keys,new int[0], values, rows, keys*10, true);
 	}
 
-	public TestDataStream(TableFromFile tableFromFile,int noOfKeys, int values, int rows, int chaos, 
+	public TestDataStream(TableFromFile tableFromFile,int noOfKeys, int keyCols[],int values, int rows, int chaos, 
 			boolean guaranteeKeyStep)
 	{
 		this.tableFromFile= tableFromFile;
+		this.keyCols=keyCols;
 		if(this.tableFromFile!=null){
 			try {
 				readTableFromFile();
-				it_lsDatum=lsDatum.iterator();
+			//	it_lsDatum=lsDatum.iterator();
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -96,6 +101,7 @@ public class TestDataStream implements Iterator<Datum[]> {
 	public boolean hasNext()
 	{
 		return it_lsDatum.hasNext();
+		//return tree_lsDatum.hasNext();
 	}
 
 	public Datum[] next()
@@ -116,7 +122,6 @@ public class TestDataStream implements Iterator<Datum[]> {
 
 
 		BufferedReader bufferedReader = new BufferedReader(new FileReader(tableFromFile.getFile()));
-
 		String data;
 		while ((data = bufferedReader.readLine()) != null){ //reading each table
 			String arrtoken[];
@@ -178,7 +183,14 @@ public class TestDataStream implements Iterator<Datum[]> {
 				}
 				arrdatum[i]=datum;
 			}
-			lsDatum.add(arrdatum);
+			
+			Datum key[]=new Datum[this.keyCols.length];
+			
+			for(int i:this.keyCols)
+				key[i]=arrdatum[i];
+			
+			tree_lsDatum.put(key, arrdatum);
+		//	lsDatum.add(arrdatum);
 		}
 		bufferedReader.close();
 	}

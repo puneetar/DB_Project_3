@@ -42,7 +42,7 @@ public class Index {
 		BufferManager bm = new BufferManager(frames);
 		FileManager fm = new FileManager(bm);
 
-		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys, 0, 0,0, true);
+		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys,keyCols, 0, 0,0, true);
 		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), keyCols);
 
 		int indexSize = ds.getRowCount()/10;
@@ -72,7 +72,7 @@ public class Index {
 		BufferManager bm = new BufferManager(frames);
 		FileManager fm = new FileManager(bm);
 
-		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys,0,0,0, true);
+		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys,keyCols,0,0,0, true);
 		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), keyCols);
 
 
@@ -107,7 +107,7 @@ public class Index {
 		BufferManager bm = new BufferManager(frames);
 		FileManager fm = new FileManager(bm);
 
-		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys,0,0,0, true);
+		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys,keyCols,0,0,0, true);
 		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), keyCols);
 
 
