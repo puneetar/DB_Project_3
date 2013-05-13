@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.io.BufferedReader;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.text.*;
 
 import edu.buffalo.cse.sql.Schema;
+import edu.buffalo.cse.sql.Index.IndexType;
 import edu.buffalo.cse.sql.Schema.Column;
 import edu.buffalo.cse.sql.Schema.Var;
 import edu.buffalo.cse.sql.data.Datum;
@@ -27,6 +29,7 @@ import edu.buffalo.cse.sql.data.Datum.Str;
 import edu.buffalo.cse.sql.optimizer.PlanRewrite;
 import edu.buffalo.cse.sql.optimizer.PushDownSelects;
 import edu.buffalo.cse.sql.plan.ExprTree;
+import edu.buffalo.cse.sql.plan.ExprTree.OpCode;
 import edu.buffalo.cse.sql.plan.Expression;
 import edu.buffalo.cse.sql.plan.ExprTree.VarLeaf;
 import edu.buffalo.cse.sql.plan.PlanNode;
@@ -330,7 +333,7 @@ public class Sql {
 		flag_hmp_tables_col_used=true;
 		List<ExprTree> lsnodes=Utility.findIndexNodes(q);
 		//changes for Phase 3: ends
-		HashMap<String,int[]> hmpindex= new HashMap<String,int[]>();
+		HashMap<Schema.TableFromFile,int[]> hmpindex= new HashMap<Schema.TableFromFile,int[]>();
 		while(tablesIterator.hasNext()){
 			Map.Entry tableEntry1 = (Map.Entry) tablesIterator.next();
 			String tablename1=(String) tableEntry1.getKey();
@@ -339,8 +342,10 @@ public class Sql {
 			String t=Sql.tablemap.get(tablename1);
 			Iterator itrnodes=lsnodes.iterator();
 			List<Integer> lsIndex= new ArrayList<Integer>();
+			ExprTree.OpCode type=null;
 			while(itrnodes.hasNext()){
 				ExprTree exp=(ExprTree) itrnodes.next();
+				type=exp.op;
 				List ls1=new Expression(exp).findColumns();
 				ExprTree.VarLeaf vf= (ExprTree.VarLeaf)ls1.get(0);
 				if(t!=null){
@@ -369,14 +374,22 @@ public class Sql {
 					arr[k]=i;
 					k=k+1;
 				}
-				hmpindex.put(tablename1, arr);
+				try {
+					Index.createIndex(tf, findType(type), arr);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//hmpindex.put(tf, arr);
 			}
 
 		}
 		Set sethmpindex=hmpindex.entrySet();
 		Iterator ithmpindex=sethmpindex.iterator();
+		Index objIndex= new Index();
 		while(ithmpindex.hasNext()){
-			//createIndex()
+			Map.Entry ent=(Entry) ithmpindex.next();
+			
 		}
 		tablesIterator = tablesSet.iterator();
 
@@ -531,4 +544,12 @@ public class Sql {
 		return bool;
 	}
 	//changes for Phase 3:ends
+	public static IndexType findType(ExprTree.OpCode op){
+		if( op.equals(OpCode.EQ)){
+			return IndexType.HASH;
+		}
+		else
+			return IndexType.ISAM;
+			
+	}
 }

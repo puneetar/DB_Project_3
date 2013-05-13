@@ -60,7 +60,9 @@ public class TestDataStream implements Iterator<Datum[]> {
 	List<Datum[]> lsDatum= new ArrayList<Datum[]>();
 	Iterator<Datum[]> it_lsDatum;
 	
-	Map<Datum[], Datum[]> tree_lsDatum=new TreeMap<Datum[],Datum[]>();
+	Map<Datum[], Datum[]> tree_lsDatum= new TreeMap<Datum[], Datum[]>();
+			//new TreeMap<Datum[],Datum[]>();
+	
 	Iterator<Datum[]> it_tree_lsDatum;
 
 
@@ -185,9 +187,9 @@ public class TestDataStream implements Iterator<Datum[]> {
 			}
 			
 			Datum key[]=new Datum[this.keyCols.length];
-			
+			int j=0;
 			for(int i:this.keyCols)
-				key[i]=arrdatum[i];
+				key[j++]=arrdatum[i];
 			
 			tree_lsDatum.put(key, arrdatum);
 		//	lsDatum.add(arrdatum);
