@@ -48,7 +48,7 @@ public class Index {
 		FileManager fm = new FileManager(bm);
 
 		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys, values, rows, keychaos, true);
-		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), numOfkeys);
+		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), keys);
 
 //		if(toScan){
 //			ManagedFile file = fm.open(idxFile);
