@@ -2,11 +2,13 @@
 package edu.buffalo.cse.sql;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,6 +36,12 @@ public class Sql {
 	public static HashMap<String, List<Datum[]>> lsMapGlobalData= new HashMap<String, List<Datum[]>>();
 	public static HashMap<String,List<String>> hmp_tables_col_used= null;
 	public static boolean flag_hmp_tables_col_used=false;
+
+
+	private static int flag_limit = 0;
+	private static Map<Datum,ArrayList<Datum[]>> globalMap = new TreeMap<Datum,ArrayList<Datum[]>>();
+	private static HashMap<String,Integer> orderByMap = new HashMap<String,Integer>();
+	private static List<String> orderByList = new ArrayList<String>();
 	public static int flag_TPCH=0;
 	public static HashMap<String,String> tablemap= new HashMap<String,String>();
 
@@ -75,9 +83,97 @@ public class Sql {
 	q=newq;
 	globalData(tables,q);
 
-	System.out.println("GLOBAL data made");
-	List<Datum[]> f1=Utility.switchNodes(q);
+	List<Datum[]> f1 = new ArrayList<Datum[]>();
+	List<Datum[]> f = new ArrayList<Datum[]>();
 
+	System.out.println("GLOBAL data made");
+	List<Datum[]> temp=Utility.switchNodes(q);
+	if(orderByMap.isEmpty()){
+		f = temp;
+	}
+	else{
+		String col1 = orderByList.get(0);
+		String table = null;
+		String column = null;
+		if(col1.contains(".")){
+			String[] schema = col1.split("\\.");
+			table = schema[0]; column = schema[1];
+		}
+		else{
+			column = col1;
+		}
+		List<Schema.Var> list=q.getSchemaVars();
+		Iterator<Schema.Var> it=list.iterator();
+		int i = 0;
+		while(it.hasNext()){
+			Schema.Var sc = it.next();
+			if(table!=null){
+				if(sc.name.equals(column) && sc.rangeVariable.equals(table)) //check
+					break;
+			}
+			else{
+				if(sc.name.equals(column))
+					break;
+			}
+			i++;
+		}
+		if(orderByMap.get(col1)==1){
+			Map<Datum,ArrayList<Datum[]>> tm = new TreeMap<Datum,ArrayList<Datum[]>>();
+			tm = sortDecreasing(temp,i);
+			f = prepare(tm);
+			globalMap = tm;
+		}
+		else{
+			Map<Datum,ArrayList<Datum[]>> tm = new TreeMap<Datum,ArrayList<Datum[]>>();
+			tm = sortIncreasing(temp,i);
+			f = prepare(tm);
+			globalMap = tm;
+		}
+		if(orderByList.size()==2){
+			String col2 = orderByList.get(1);
+			String table1 = null;
+			String column1 = null;
+			if(col2.contains(".")){
+				String[] schema = col2.split(".");
+				table1 = schema[0]; column1 = schema[1];
+			}
+			else{
+				column1 = col2;
+			}
+			Iterator<Schema.Var> iterator = list.iterator();
+			int j = 0;
+			while(iterator.hasNext()){
+				Schema.Var sc = iterator.next();
+				if(table1!=null){
+					if(sc.name.equals(column1) && sc.rangeVariable.equals(table1)) //check
+						break;
+				}
+				else{
+					if(sc.name.equals(column1))
+						break;
+				}
+				j++;
+			}
+			Map<Datum,ArrayList<Datum[]>> tm1 = new TreeMap<Datum,ArrayList<Datum[]>>();
+			Map<Datum,ArrayList<Datum[]>> finalMap = new TreeMap<Datum,ArrayList<Datum[]>>();
+			for(Map.Entry<Datum,ArrayList<Datum[]>> entry : globalMap.entrySet()){
+				ArrayList<Datum[]> al = entry.getValue();
+				if(al.size()>1){
+					tm1 = sortIncreasing(al,j);
+					ArrayList<Datum[]> newDatumList = prepare(tm1);
+					finalMap.put(entry.getKey(), newDatumList);
+				}
+				else{
+					finalMap.put(entry.getKey(), al);
+				}
+			}
+			f = prepare(finalMap);
+		}
+	}
+	if(flag_limit==0)
+		f1 = f;
+	else
+		f1 = f.subList(0, flag_limit);
 
 	TableBuilder output = new TableBuilder();
 
@@ -132,9 +228,67 @@ public class Sql {
 		System.out.println("flag TPCH is set =1");
 		flag_TPCH=1;
 	}
+	
+	public static void setLimit(int lim){
+		flag_limit = lim;
+	}
+	
+	public static void setOrderMap(HashMap<String,Integer> map){
+		orderByMap = map;
+	}
 
-
-
+	public static void setOrderList(List<String> list){
+		orderByList = list;
+	}
+	
+	public static Map<Datum, ArrayList<Datum[]>> sortIncreasing(List<Datum[]> temp,int i){
+		Map<Datum,ArrayList<Datum[]>> tm = new TreeMap<Datum,ArrayList<Datum[]>>();
+		Iterator<Datum[]> it1 = temp.iterator();
+		while(it1.hasNext()){
+			Datum[] d = it1.next();
+			if(tm.containsKey(d[i])){
+				ArrayList<Datum[]> l = tm.get(d[i]);
+				l.add(d);
+			}
+			else{
+				ArrayList<Datum[]> l = new ArrayList<Datum[]>();
+				l.add(d);
+				tm.put(d[i], l);
+			}
+		}
+		return tm;
+	}
+	
+	public static Map<Datum, ArrayList<Datum[]>> sortDecreasing(List<Datum[]> temp,int i){
+		Map<Datum,ArrayList<Datum[]>> tm = new TreeMap<Datum,ArrayList<Datum[]>>(Collections.reverseOrder());
+		Iterator<Datum[]> it1 = temp.iterator();
+		while(it1.hasNext()){
+			Datum[] d = it1.next();
+			if(tm.containsKey(d[i])){
+				ArrayList<Datum[]> l = tm.get(d[i]);
+				l.add(d);
+			}
+			else{
+				ArrayList<Datum[]> l = new ArrayList<Datum[]>();
+				l.add(d);
+				tm.put(d[i], l);
+			}
+		}
+		return tm;
+	}
+	
+	public static ArrayList<Datum[]> prepare(Map<Datum,ArrayList<Datum[]>> tm){
+		ArrayList<Datum[]> f = new ArrayList<Datum[]>();
+		for(Map.Entry<Datum,ArrayList<Datum[]>> entry : tm.entrySet()){
+			ArrayList<Datum[]> l = entry.getValue();
+			Iterator<Datum[]> it2 = l.iterator();
+			while(it2.hasNext()){
+				Datum[] lDatum = it2.next();
+				f.add(lDatum);
+			}
+		}
+		return f;
+	}
 	public static  void globalData(Map<String, Schema.TableFromFile> tables,PlanNode q) throws SqlException{
 		Set tablesSet = tables.entrySet();
 		Iterator tablesIterator = tablesSet.iterator();
