@@ -54,19 +54,19 @@ public class TestDataStream implements Iterator<Datum[]> {
 	int rows;
 	int values;
 	int[] curr;
-	int[] keyCols;
+	int keyCols;
 	int chaos;
 	TableFromFile tableFromFile;
 	
-	public Map<Datum[], ArrayList<Datum[]>> tree_lsDatum= new TreeMap<Datum[], ArrayList<Datum[]>>(new DatumCompare());
-	Iterator<Entry<Datum[], ArrayList<Datum[]>>> it_tree_lsDatum;
+	public Map<Datum, ArrayList<Datum[]>> tree_lsDatum= new TreeMap<Datum, ArrayList<Datum[]>>();
+	Iterator<Entry<Datum, ArrayList<Datum[]>>> it_tree_lsDatum;
 
 	public TestDataStream(int keys, int values, int rows)
 	{ 
-		this(null,keys,new int[0], values, rows, keys*10, true);
+		this(null,keys,0, values, rows, keys*10, true);
 	}
 
-	public TestDataStream(TableFromFile tableFromFile,int noOfKeys, int keyCols[],int values, int rows, int chaos, 
+	public TestDataStream(TableFromFile tableFromFile,int noOfKeys, int keyCols,int values, int rows, int chaos, 
 			boolean guaranteeKeyStep)
 	{
 		this.tableFromFile= tableFromFile;
@@ -74,7 +74,7 @@ public class TestDataStream implements Iterator<Datum[]> {
 		if(this.tableFromFile!=null && guaranteeKeyStep==false){
 			try {
 				readTableFromFile();
-				Set<Entry<Datum[], ArrayList<Datum[]>>> set=tree_lsDatum.entrySet();
+				Set<Entry<Datum, ArrayList<Datum[]>>> set=tree_lsDatum.entrySet();
 				it_tree_lsDatum=set.iterator();
 			//	it_lsDatum=lsDatum.iterator();
 			} catch (NumberFormatException e) {
@@ -180,12 +180,13 @@ public class TestDataStream implements Iterator<Datum[]> {
 				arrdatum[i]=datum;
 			}
 			
-Datum key[]=new Datum[this.keyCols.length];
-			
-			int j=0;
-			for(int i:this.keyCols)
-				key[j++]=arrdatum[i];
-			
+//Datum key[]=new Datum[this.keyCols.length];
+//			
+//			int j=0;
+//			for(int i:this.keyCols)
+//				key[j++]=arrdatum[i];
+//			
+			Datum key=arrdatum[keyCols];
 			if(tree_lsDatum.containsKey(key)){
 				ArrayList<Datum[]> arr=tree_lsDatum.get(key);
 				arr.add(arrdatum);
