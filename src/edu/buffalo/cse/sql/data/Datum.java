@@ -7,7 +7,7 @@ import java.util.Stack;
 import edu.buffalo.cse.sql.SqlException;
 import edu.buffalo.cse.sql.Schema;
 
-public abstract class Datum implements Comparator<Datum>, Comparable<Datum>{  
+public abstract class Datum implements Comparator<Datum[]>, Comparable<Datum>{  
 	public abstract String toString();
 	public abstract String toOnlyString();
 	public abstract boolean toBool() throws CastError;
@@ -27,9 +27,9 @@ public abstract class Datum implements Comparator<Datum>, Comparable<Datum>{
 		catch (ClassCastException e) { return false; }
 	}
 	@Override
-	public int compare(Datum arg0, Datum arg1) {
-		return arg0.compareTo(arg1);
-	}
+//	public int compare(Datum arg0, Datum arg1) {
+//		return arg0.compareTo(arg1);
+//	}
 	 public int compare(Datum[] a, Datum[] b){
 		    return Datum.compareRows(a, b);
 		  }

@@ -1030,7 +1030,22 @@ public class Expression extends ExprTree {
 			break;
 		}
 		case CONST:{
+			Datum[] d=new Datum[1];
+			ExprTree.ConstLeaf cf=(ExprTree.ConstLeaf)this.expr;
 
+			for(StackTraceElement e:Thread.currentThread().getStackTrace())
+			{
+				if(e.getClassName().equals("edu.buffalo.cse.sql.plan.Project"))
+				{
+					d[0]=cf.v;
+					return new ManageList().toListOfDatumArray(d);
+				}
+				else if(e.getClassName().equals("edu.buffalo.cse.sql.plan.Aggregate"))
+				{
+					//return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(cf.v.toInt()));
+					return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(0));
+				}
+			}
 			break;
 		}
 		case VAR:{

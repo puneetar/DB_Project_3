@@ -48,11 +48,20 @@ public class Sql {
 	public static int flag_TPCH=0;
 	public static HashMap<String,String> tablemap= new HashMap<String,String>();
 
+	public static int flag_index=0;
+
 	public static void main( String[] args )
 	{
 
+		for(String arg: args){
+			if(arg.equalsIgnoreCase("-index")){
+				flag_index=1;
+				break;
+			}
+		}
+
 		try {
-			List<List<Datum[]>> result=Sql.execFile(new File(args[0]));
+			List<List<Datum[]>> result=Sql.execFile(new File(flag_index==1?args[1]:args[0]));
 
 			TableBuilder output = new TableBuilder();
 			//			    for(Schema.Column c : querySchema){
@@ -71,6 +80,9 @@ public class Sql {
 			}
 
 			System.out.println(output.toString());
+
+
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (SqlException e) {
@@ -191,28 +203,29 @@ public class Sql {
 	else
 		f1 = f.subList(0, flag_limit);
 	//----------------UTKARSH code : end Order By && LIMIT
-	
-//	TableBuilder output = new TableBuilder();
-//	List<Schema.Var> list=q.getSchemaVars();
-//	Iterator<Schema.Var> it=list.iterator();
-//	while(it.hasNext()){
-//		Schema.Var sc=it.next();
-//		// output.newCell(sc.name);
-//		System.out.println(sc.name+" : "+sc.rangeVariable);
-//	}
-//	Iterator<Datum[]> resultIterator=f1.iterator();
-//
-//	output.addDividerLine();
-//	while(resultIterator.hasNext()){
-//		Datum[] row = resultIterator.next();
-//		output.newRow();
-//		for(Datum d : row){
-//			output.newCell(d.toString());
-//		}
-//	}
-//
-//	System.out.println(output.toString());
+
+	//	TableBuilder output = new TableBuilder();
+	//	List<Schema.Var> list=q.getSchemaVars();
+	//	Iterator<Schema.Var> it=list.iterator();
+	//	while(it.hasNext()){
+	//		Schema.Var sc=it.next();
+	//		// output.newCell(sc.name);
+	//		System.out.println(sc.name+" : "+sc.rangeVariable);
+	//	}
+	//	Iterator<Datum[]> resultIterator=f1.iterator();
+	//
+	//	output.addDividerLine();
+	//	while(resultIterator.hasNext()){
+	//		Datum[] row = resultIterator.next();
+	//		output.newRow();
+	//		for(Datum d : row){
+	//			output.newCell(d.toString());
+	//		}
+	//	}
+	//
+	//	System.out.println(output.toString());
 	flag_hmp_tables_col_used=false;
+
 
 	return f1;
 
@@ -278,66 +291,82 @@ public class Sql {
 
 		hmp_tables_col_used=hmp;
 		flag_hmp_tables_col_used=true;
-		List<ExprTree> lsnodes=Utility.findIndexNodes(q);
-		//changes for Phase 3: ends
-		HashMap<Schema.TableFromFile,int[]> hmpindex= new HashMap<Schema.TableFromFile,int[]>();
-		while(tablesIterator.hasNext()){
-			Map.Entry tableEntry1 = (Map.Entry) tablesIterator.next();
-			String tablename1=(String) tableEntry1.getKey();
-			Schema.TableFromFile tf=(Schema.TableFromFile)tableEntry1.getValue();
-			List<Schema.Column> lscolumn1= ((Schema.TableFromFile)tableEntry1.getValue());
-			String t=Sql.tablemap.get(tablename1);
-			Iterator itrnodes=lsnodes.iterator();
-			List<Integer> lsIndex= new ArrayList<Integer>();
-			ExprTree.OpCode type=null;
-			while(itrnodes.hasNext()){
-				ExprTree exp=(ExprTree) itrnodes.next();
-				type=exp.op;
-				List ls1=new Expression(exp).findColumns();
-				ExprTree.VarLeaf vf= (ExprTree.VarLeaf)ls1.get(0);
-				if(t!=null){
-					if(t.equals(vf.name.rangeVariable)){
-						int index1=-1;
-						Iterator<Column> it=lscolumn1.iterator();
 
-						while(it.hasNext()){
-							index1=index1+1;
-							Schema.Column column=(Column) it.next();
-							if(column.name.equals(vf.name))
-								if(!lsIndex.contains(index1))
-									lsIndex.add(index1);
+		if(flag_index==1){
+			List<ExprTree> lsnodes=Utility.findIndexNodes(q);
+			//changes for Phase 3: ends
+			HashMap<Schema.TableFromFile,int[]> hmpindex= new HashMap<Schema.TableFromFile,int[]>();
+			while(tablesIterator.hasNext()){
+				Map.Entry tableEntry1 = (Map.Entry) tablesIterator.next();
+				String tablename1=(String) tableEntry1.getKey();
+				Schema.TableFromFile tf=(Schema.TableFromFile)tableEntry1.getValue();
+				List<Schema.Column> lscolumn1= ((Schema.TableFromFile)tableEntry1.getValue());
+				String t=Sql.tablemap.get(tablename1);
+				Iterator itrnodes=lsnodes.iterator();
+				List<Integer> lsIndex= new ArrayList<Integer>();
+				List<IndexCondition> lsic= new ArrayList<IndexCondition>();
+				ExprTree.OpCode op=null;
+				while(itrnodes.hasNext()){
+					ExprTree exp=(ExprTree) itrnodes.next();
+					op=exp.op;
+					List ls1=new Expression(exp).findColumns();
+					
+					Datum[] d=new Datum[1];
+					ExprTree.ConstLeaf cf=(ExprTree.ConstLeaf)exp.get(1);
+						d[0]=cf.v;
+						
+					ExprTree.VarLeaf vf= (ExprTree.VarLeaf)ls1.get(0);
+					if(t!=null){
+						if(t.equals(vf.name.rangeVariable)){
+							int index1=-1;
+							Iterator<Column> it=lscolumn1.iterator();
+
+							while(it.hasNext()){
+								index1=index1+1;
+								Schema.Column column=(Column) it.next();
+								if(column.name.equals(vf.name)){
+									IndexCondition ic= new  IndexCondition(findType(op),op ,d[0]);
+									lsic.add(ic);
+									if(!lsIndex.contains(index1))
+										lsIndex.add(index1);
+								}
+							}
+
 						}
-
 					}
+
+				}
+
+
+				if(lsIndex.size()!=0){
+					Iterator itindex= lsIndex.iterator();
+					int[] arr=new int[lsIndex.size()];
+					int k=0;
+					while(itindex.hasNext()){
+						int i=(Integer) itindex.next();
+						arr[k]=i;
+						k=k+1;
+					}
+					try {
+						
+						Index.createIndex(tf, findType(type), arr);
+						if(findType(type)==IndexType.HASH){
+							//Index.getFromIndex(tf, findType(type), arr, get)
+						}
+						else if(findType(type)==IndexType.ISAM){
+							
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					//hmpindex.put(tf, arr);
 				}
 
 			}
-			if(lsIndex.size()!=0){
-				Iterator itindex= lsIndex.iterator();
-				int[] arr=new int[lsIndex.size()];
-				int k=0;
-				while(itindex.hasNext()){
-					int i=(Integer) itindex.next();
-					arr[k]=i;
-					k=k+1;
-				}
-				try {
-					Index.createIndex(tf, findType(type), arr);
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				//hmpindex.put(tf, arr);
-			}
-
+			
 		}
-		Set sethmpindex=hmpindex.entrySet();
-		Iterator ithmpindex=sethmpindex.iterator();
-		Index objIndex= new Index();
-		while(ithmpindex.hasNext()){
-			Map.Entry ent=(Entry) ithmpindex.next();
 
-		}
 		tablesIterator = tablesSet.iterator();
 
 		while(tablesIterator.hasNext()){ ///loop for each table
