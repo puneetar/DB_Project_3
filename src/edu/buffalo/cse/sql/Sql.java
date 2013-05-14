@@ -59,7 +59,7 @@ public class Sql {
 		for(String arg: args){
 			if(arg.equalsIgnoreCase("-index")){
 				flag_index=1;
-				break;
+				//break;
 			}
 			else if(arg.equalsIgnoreCase("-explain")){
 				flag_explain=1;
