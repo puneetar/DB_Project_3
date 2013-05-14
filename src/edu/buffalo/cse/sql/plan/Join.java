@@ -135,15 +135,27 @@ public class Join extends JoinNode {
 			}
 		}
 		Iterator<Datum[]> it2 = secondary.iterator();
+		int num=0;
+		int k1=0;
+		int k2=0;
 		//Datum[] res = new Datum[r+m];
 		while(it2.hasNext()){		
 			Datum[] row = it2.next();
 			Datum[] res = new Datum[primary.size()+secondary.size()];
+			num=num+1;
 			
 			if(hhj.containsKey(row[idx2])){
 				ArrayList<Datum[]> temp = hhj.get(row[idx2]);
 				Iterator<Datum[]> it3 = temp.iterator();
 				while(it3.hasNext()){
+					if(num==k1+1000){
+						k1=k1+1000;
+						System.out.println("Join:" + num);
+					}
+					if(num==k2+50000){
+						k2=k2+50000;
+						System.out.println("I am here");
+					}
 					Datum[] matchedRow = it3.next();
 					if(lhs.size()<=rhs.size()){
 						res= new Datum[row.length + matchedRow.length];

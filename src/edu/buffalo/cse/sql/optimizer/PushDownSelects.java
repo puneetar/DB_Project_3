@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import edu.buffalo.cse.sql.Schema;
 import edu.buffalo.cse.sql.Schema.Var;
+import edu.buffalo.cse.sql.Sql;
 import edu.buffalo.cse.sql.SqlException;
 import edu.buffalo.cse.sql.plan.ExprTree;
 import edu.buffalo.cse.sql.plan.ExprTree.VarLeaf;
@@ -24,7 +25,7 @@ public class PushDownSelects extends PlanRewrite{
 
 	@Override
 	protected PlanNode apply(PlanNode node) throws SqlException {
-		
+
 		edu.buffalo.cse.sql.plan.PlanNode.Type type=node.type;
 		switch(type){
 		case AGGREGATE:{
@@ -44,18 +45,18 @@ public class PushDownSelects extends PlanRewrite{
 						JoinNode jn=(JoinNode) objSelect.getChild();
 						//if(jn.getJoinType()==JType.NLJ){
 
-							List ls=new Expression(exp).findColumns();
-							if(ls.size()!=1){
+						List ls=new Expression(exp).findColumns();
+						if(ls.size()!=1){
 							boolean bool=joinS(jn,ls,exp);
 							if (bool){
 								lsremove.add(exp);
-							//}
-						}
+								//}
+							}
 							else{
 								lsnotremove.add(exp);
 							}
+						}
 					}
-				}
 				}
 				case GT:
 				case LT:
@@ -64,9 +65,11 @@ public class PushDownSelects extends PlanRewrite{
 				case NEQ:{
 					List ls=new Expression(exp).findColumns();
 					if(ls.size()==1){
-						PlanNode node1=objSelect.getChild();
-						if(findscan(node1,ls,exp)){
-							lsremove.add(exp);
+						if(Sql.flag_index==1){
+							PlanNode node1=objSelect.getChild();
+							if(findscan(node1,ls,exp)){
+								lsremove.add(exp);
+							}
 						}
 
 					}
@@ -83,17 +86,17 @@ public class PushDownSelects extends PlanRewrite{
 						if(lsnotremove.size()!=0){
 							expr=lsnotremove.get(0);
 						}
-						
+
 						objSelect.setCondition(expr);
 					}
 					else{
 						if(objSelect.getCondition().remove(expremove)){
-						if(objSelect.getCondition()!=null || !objSelect.getCondition().isEmpty()){
-							ExprTree.OpCode op=objSelect.getCondition().get(0).op;
-							objSelect.setCondition(objSelect.getCondition().get(0));
-							//objSelect.getCondition().op=op;
-							System.out.println("");
-						}
+							if(objSelect.getCondition()!=null || !objSelect.getCondition().isEmpty()){
+								ExprTree.OpCode op=objSelect.getCondition().get(0).op;
+								objSelect.setCondition(objSelect.getCondition().get(0));
+								//objSelect.getCondition().op=op;
+								System.out.println("");
+							}
 						}
 						else{
 							if(lsnotremove.size()!=0){
@@ -109,7 +112,7 @@ public class PushDownSelects extends PlanRewrite{
 											objSelect.setCondition(objSelect.getCondition().get(0));
 											//objSelect.getCondition().op=op;
 											System.out.println("");
-											
+
 										}
 									}
 								}
@@ -130,7 +133,7 @@ public class PushDownSelects extends PlanRewrite{
 		case SCAN:{
 			ScanNode objScan=(ScanNode)node;
 			if(objScan.getCondition()!=null&& !objScan.getCondition().isEmpty() ){
-			
+
 				IndexScanNode objindex=new IndexScanNode(objScan.table, objScan.schema,objScan.getCondition());
 				node=objindex ;
 			}
@@ -192,9 +195,9 @@ public class PushDownSelects extends PlanRewrite{
 		if(joinsuitable(lsvar,ls)){
 			if(joinsuitable(lsvar1,ls)){
 				if(jn.getCondition()==null){
-				jn.setJoinType(JType.HASH);
-				jn.setCondition(exp);
-				bool=true;
+					jn.setJoinType(JType.HASH);
+					jn.setCondition(exp);
+					bool=true;
 				}
 			}
 

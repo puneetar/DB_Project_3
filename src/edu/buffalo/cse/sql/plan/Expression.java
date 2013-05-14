@@ -742,6 +742,7 @@ public class Expression extends ExprTree {
 			List<Datum[]> lhs=(new Expression(expr.get(0),data,schemaOfData)).doExpr();
 			List<Datum[]> rhs=(new Expression(expr.get(1),data,schemaOfData)).doExpr();
 
+			System.out.println("expression");
 			Datum[] arrLHS=new ManageList(lhs).getColumn(0);
 			Datum[] arrRHS=new ManageList(rhs).getColumn(0);
 
@@ -906,7 +907,7 @@ public class Expression extends ExprTree {
 
 			for(StackTraceElement e:Thread.currentThread().getStackTrace())
 			{
-				if(e.getClassName().equals("edu.buffalo.cse.sql.plan.Project"))
+				if(e.getClassName().equals("edu.buffalo.cse.sql.plan.Project")||e.getClassName().equals("edu.buffalo.cse.sql.plan.Select"))
 				{
 					d[0]=cf.v;
 					return new ManageList().toListOfDatumArray(d);

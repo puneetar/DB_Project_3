@@ -49,19 +49,26 @@ public class Sql {
 	public static HashMap<String,String> tablemap= new HashMap<String,String>();
 
 	public static int flag_index=0;
+	public static int flag_explain=0;
 
 	public static void main( String[] args )
 	{
-
+		String filename=null;
 		for(String arg: args){
 			if(arg.equalsIgnoreCase("-index")){
 				flag_index=1;
-				break;
+				//break;
+			}
+			else if(arg.equalsIgnoreCase("-explain")){
+				flag_explain=1;
+			}
+			else{
+				filename=arg;
 			}
 		}
 
 		try {
-			List<List<Datum[]>> result=Sql.execFile(new File(flag_index==1?args[1]:args[0]));
+			List<List<Datum[]>> result=Sql.execFile(new File(filename));
 
 			TableBuilder output = new TableBuilder();
 			//			    for(Schema.Column c : querySchema){
@@ -94,8 +101,13 @@ public class Sql {
 
 	public static List<Datum[]> execQuery(Map<String, Schema.TableFromFile> tables,PlanNode q)throws SqlException
 	{	PushDownSelects objPush= new PushDownSelects(true);
-	System.out.println(q);
+
 	PlanNode newq=objPush.rewrite(q);
+	if(flag_explain==1){
+		System.out.println(q);
+		System.out.println(newq);
+	}
+	System.out.println(q);
 	System.out.println(newq);
 	q=newq;
 	globalData(tables,q);
@@ -342,273 +354,273 @@ public class Sql {
 					}
 
 				}
-				
-					try {
-						if(lsic.size()>0){
-							Iterator<IndexCondition> it_lsic=lsic.iterator();
-							int arr_key[]=new int[lsic.size()];
-							Datum arr_value[]=new Datum[lsic.size()];
-							ExprTree.OpCode arr_opCode[]=new ExprTree.OpCode[lsic.size()]; 
-							int i=0;
-							while(it_lsic.hasNext()){
-								arr_key[i++]=it_lsic.next().getIndex();
-								arr_value[i++]=it_lsic.next().getValue();
-								arr_opCode[i++]=it_lsic.next().getOpCode();
-							}
-							Index.createIndex(tf, findType(lsic.get(0).getOpCode()), arr_key);
-							
-							switch(findType(lsic.get(0).getOpCode())){
-							case HASH:
-								List<Datum[]> lsIndexDatum=Index.getFromIndex(tf, IndexType.HASH, arr_key, arr_value);
-								lsMapGlobalData.put(tablename, lsIndexDatum);
-								lsGlobalData.add(lsIndexDatum);
-								break;
-							case ISAM:
-//								if(lsic.size()==2){
-//									
-//								}
-//								else if(lsic.size()==1){
-//									
-//								}
-								
-								
-								break;
-							default:
-								break;
-							}
-							
+
+				try {
+					if(lsic.size()>0){
+						Iterator<IndexCondition> it_lsic=lsic.iterator();
+						int arr_key[]=new int[lsic.size()];
+						Datum arr_value[]=new Datum[lsic.size()];
+						ExprTree.OpCode arr_opCode[]=new ExprTree.OpCode[lsic.size()]; 
+						int i=0;
+						while(it_lsic.hasNext()){
+							arr_key[i++]=it_lsic.next().getIndex();
+							arr_value[i++]=it_lsic.next().getValue();
+							arr_opCode[i++]=it_lsic.next().getOpCode();
 						}
-						else{
-							File filename = (File)tf.getFile();
-							bufferedReader = new BufferedReader(new FileReader(filename));
-							Iterator itlscolumn=lscolumn.iterator();
-							int index=-1;
-							List<Integer> lsIndex= new ArrayList<Integer>();
+						Index.createIndex(tf, findType(lsic.get(0).getOpCode()), arr_key);
 
-							while(itlscolumn.hasNext()){
-								index=index+1;
-								Schema.Column column=(Column) itlscolumn.next();
-								if(!hmp.isEmpty()&& !findColName(hmp,tablename,column.name.name) )
-									continue;
-								else{
-									lsIndex.add(index);
-								}
-							}
-							Iterator<Integer> ilsIndex=lsIndex.iterator();
-							while ((data = bufferedReader.readLine()) != null){ //reading each table
-								String arrtoken[];
+						switch(findType(lsic.get(0).getOpCode())){
+						case HASH:
+							List<Datum[]> lsIndexDatum=Index.getFromIndex(tf, IndexType.HASH, arr_key, arr_value);
+							lsMapGlobalData.put(tablename, lsIndexDatum);
+							lsGlobalData.add(lsIndexDatum);
+							break;
+						case ISAM:
+							//								if(lsic.size()==2){
+							//									
+							//								}
+							//								else if(lsic.size()==1){
+							//									
+							//								}
 
-								if(flag_TPCH==0){
-									arrtoken=data.split(",");
-								}
-								else{
-									arrtoken=data.split("\\|");
-								}
-								//changes for Phase 3:starts
-								//Datum[] arrdatum=new Datum[arrtoken.length];
-								Datum[] arrdatum=new Datum[lsIndex.size()];//changed for Phase3
-								//for(int i=0;i<arrtoken.length;i++){
-								int i=0;
-								int j=0;
-								ilsIndex=lsIndex.iterator();
-								while(ilsIndex.hasNext()){ //change for Phase 3
-									i=ilsIndex.next();
-									//changes for Phase 3:ends
-									String token=arrtoken[i];
-									Schema.Column col=tf.get(i);
 
-									if(col.type.equals(Schema.Type.INT)){
-										try {
-											datum= new Datum.Int(Integer.parseInt(token));
-										} catch (NumberFormatException e) {
-
-											//System.out.println("Not a Integer");
-											if(token.contains("#")){
-												System.out.println("contain #");
-												token=token.substring(token.indexOf("#")+1);
-												datum= new Datum.Int(Integer.parseInt(token));
-											}
-											else if(token.contains("-")){
-												//System.out.println("can be a date");
-												SimpleDateFormat df=new SimpleDateFormat("yyyy-mm-dd");
-												df.setLenient(false);
-												try {
-													df.parse(token);
-													token=token.replace("-","");
-													//System.out.println("the TOKEN is :"+token);
-													datum= new Datum.Int(Integer.parseInt(token));
-												} catch (java.text.ParseException e1) {
-
-													//e1.printStackTrace();
-													System.out.println("Contains \"-\" but not a date");
-												}
-
-											}
-											else
-												e.printStackTrace();
-										}
-										//Schema.Type t=datum.getType();
-										//System.out.println(t);
-									}
-									else if(col.type.equals(Schema.Type.FLOAT)){
-										datum= new Flt(Float.parseFloat(token));
-									}
-									else if(col.type.equals(Schema.Type.BOOL)){
-										if(token.equals("True")){
-											datum= Bool.TRUE;
-										}
-										else{
-											datum=Bool.FALSE;
-										}
-									}
-									else if(col.type.equals(Schema.Type.STRING)){
-										datum= new Str(token);
-									}
-									arrdatum[j]=datum;
-									j=j+1;
-								}//end of token array
-								lsDatum.add(arrdatum);
-								//lsDatum.get(0)[1].getType();
-
-							}
-							bufferedReader.close();
-							lsMapGlobalData.put(tablename, lsDatum);
-							lsGlobalData.add(lsDatum);
+							break;
+						default:
+							break;
 						}
 
-
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
 					}
-					//hmpindex.put(tf, arr);
-				}
+					else{
+						File filename = (File)tf.getFile();
+						bufferedReader = new BufferedReader(new FileReader(filename));
+						Iterator itlscolumn=lscolumn.iterator();
+						int index=-1;
+						List<Integer> lsIndex= new ArrayList<Integer>();
 
-			
+						while(itlscolumn.hasNext()){
+							index=index+1;
+							Schema.Column column=(Column) itlscolumn.next();
+							if(!hmp.isEmpty()&& !findColName(hmp,tablename,column.name.name) )
+								continue;
+							else{
+								lsIndex.add(index);
+							}
+						}
+						Iterator<Integer> ilsIndex=lsIndex.iterator();
+						while ((data = bufferedReader.readLine()) != null){ //reading each table
+							String arrtoken[];
+
+							if(flag_TPCH==0){
+								arrtoken=data.split(",");
+							}
+							else{
+								arrtoken=data.split("\\|");
+							}
+							//changes for Phase 3:starts
+							//Datum[] arrdatum=new Datum[arrtoken.length];
+							Datum[] arrdatum=new Datum[lsIndex.size()];//changed for Phase3
+							//for(int i=0;i<arrtoken.length;i++){
+							int i=0;
+							int j=0;
+							ilsIndex=lsIndex.iterator();
+							while(ilsIndex.hasNext()){ //change for Phase 3
+								i=ilsIndex.next();
+								//changes for Phase 3:ends
+								String token=arrtoken[i];
+								Schema.Column col=tf.get(i);
+
+								if(col.type.equals(Schema.Type.INT)){
+									try {
+										datum= new Datum.Int(Integer.parseInt(token));
+									} catch (NumberFormatException e) {
+
+										//System.out.println("Not a Integer");
+										if(token.contains("#")){
+											System.out.println("contain #");
+											token=token.substring(token.indexOf("#")+1);
+											datum= new Datum.Int(Integer.parseInt(token));
+										}
+										else if(token.contains("-")){
+											//System.out.println("can be a date");
+											SimpleDateFormat df=new SimpleDateFormat("yyyy-mm-dd");
+											df.setLenient(false);
+											try {
+												df.parse(token);
+												token=token.replace("-","");
+												//System.out.println("the TOKEN is :"+token);
+												datum= new Datum.Int(Integer.parseInt(token));
+											} catch (java.text.ParseException e1) {
+
+												//e1.printStackTrace();
+												System.out.println("Contains \"-\" but not a date");
+											}
+
+										}
+										else
+											e.printStackTrace();
+									}
+									//Schema.Type t=datum.getType();
+									//System.out.println(t);
+								}
+								else if(col.type.equals(Schema.Type.FLOAT)){
+									datum= new Flt(Float.parseFloat(token));
+								}
+								else if(col.type.equals(Schema.Type.BOOL)){
+									if(token.equals("True")){
+										datum= Bool.TRUE;
+									}
+									else{
+										datum=Bool.FALSE;
+									}
+								}
+								else if(col.type.equals(Schema.Type.STRING)){
+									datum= new Str(token);
+								}
+								arrdatum[j]=datum;
+								j=j+1;
+							}//end of token array
+							lsDatum.add(arrdatum);
+							//lsDatum.get(0)[1].getType();
+
+						}
+						bufferedReader.close();
+						lsMapGlobalData.put(tablename, lsDatum);
+						lsGlobalData.add(lsDatum);
+					}
+
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				//hmpindex.put(tf, arr);
+			}
+
+
 
 		}
 		else{
 
-		//tablesIterator = tablesSet.iterator();
+			//tablesIterator = tablesSet.iterator();
 
-		while(tablesIterator.hasNext()){ ///loop for each table
-			BufferedReader bufferedReader = null;
-			String data=null;
-			Datum datum = null;
+			while(tablesIterator.hasNext()){ ///loop for each table
+				BufferedReader bufferedReader = null;
+				String data=null;
+				Datum datum = null;
 
-			List<Datum[]> lsDatum= new ArrayList<Datum[]>();
-			try{
-				Map.Entry tableEntry = (Map.Entry) tablesIterator.next();
-				File filename = (File)(((Schema.TableFromFile)tableEntry.getValue()).getFile());
-				bufferedReader = new BufferedReader(new FileReader(filename));
-				//Schema.Column column=((Schema.TableFromFile)tableEntry.getValue()).get(0); //changes for Phase 3
+				List<Datum[]> lsDatum= new ArrayList<Datum[]>();
+				try{
+					Map.Entry tableEntry = (Map.Entry) tablesIterator.next();
+					File filename = (File)(((Schema.TableFromFile)tableEntry.getValue()).getFile());
+					bufferedReader = new BufferedReader(new FileReader(filename));
+					//Schema.Column column=((Schema.TableFromFile)tableEntry.getValue()).get(0); //changes for Phase 3
 
-				String tablename=(String) tableEntry.getKey();
-				//changes for Phase 3:starts
-				List<Schema.Column> lscolumn= ((Schema.TableFromFile)tableEntry.getValue());
-				Iterator itlscolumn=lscolumn.iterator();
-				int index=-1;
-				List<Integer> lsIndex= new ArrayList<Integer>();
-
-				while(itlscolumn.hasNext()){
-					index=index+1;
-					Schema.Column column=(Column) itlscolumn.next();
-					if(!hmp.isEmpty()&& !findColName(hmp,tablename,column.name.name) )
-						continue;
-					else{
-						lsIndex.add(index);
-					}
-				}
-				Iterator<Integer> ilsIndex=lsIndex.iterator();
-				//changes for Phase 3:ends
-				while ((data = bufferedReader.readLine()) != null){ //reading each table
-					String arrtoken[];
-
-					if(flag_TPCH==0){
-						arrtoken=data.split(",");
-					}
-					else{
-						arrtoken=data.split("\\|");
-					}
+					String tablename=(String) tableEntry.getKey();
 					//changes for Phase 3:starts
-					//Datum[] arrdatum=new Datum[arrtoken.length];
-					Datum[] arrdatum=new Datum[lsIndex.size()];//changed for Phase3
-					//for(int i=0;i<arrtoken.length;i++){
-					int i=0;
-					int j=0;
-					ilsIndex=lsIndex.iterator();
-					while(ilsIndex.hasNext()){ //change for Phase 3
-						i=ilsIndex.next();
-						//changes for Phase 3:ends
-						String token=arrtoken[i];
-						Schema.Column col=((Schema.TableFromFile)tableEntry.getValue()).get(i);
+					List<Schema.Column> lscolumn= ((Schema.TableFromFile)tableEntry.getValue());
+					Iterator itlscolumn=lscolumn.iterator();
+					int index=-1;
+					List<Integer> lsIndex= new ArrayList<Integer>();
 
-						if(col.type.equals(Schema.Type.INT)){
-							try {
-								datum= new Datum.Int(Integer.parseInt(token));
-							} catch (NumberFormatException e) {
+					while(itlscolumn.hasNext()){
+						index=index+1;
+						Schema.Column column=(Column) itlscolumn.next();
+						if(!hmp.isEmpty()&& !findColName(hmp,tablename,column.name.name) )
+							continue;
+						else{
+							lsIndex.add(index);
+						}
+					}
+					Iterator<Integer> ilsIndex=lsIndex.iterator();
+					//changes for Phase 3:ends
+					while ((data = bufferedReader.readLine()) != null){ //reading each table
+						String arrtoken[];
 
-								//System.out.println("Not a Integer");
-								if(token.contains("#")){
-									System.out.println("contain #");
-									token=token.substring(token.indexOf("#")+1);
+						if(flag_TPCH==0){
+							arrtoken=data.split(",");
+						}
+						else{
+							arrtoken=data.split("\\|");
+						}
+						//changes for Phase 3:starts
+						//Datum[] arrdatum=new Datum[arrtoken.length];
+						Datum[] arrdatum=new Datum[lsIndex.size()];//changed for Phase3
+						//for(int i=0;i<arrtoken.length;i++){
+						int i=0;
+						int j=0;
+						ilsIndex=lsIndex.iterator();
+						while(ilsIndex.hasNext()){ //change for Phase 3
+							i=ilsIndex.next();
+							//changes for Phase 3:ends
+							String token=arrtoken[i];
+							Schema.Column col=((Schema.TableFromFile)tableEntry.getValue()).get(i);
+
+							if(col.type.equals(Schema.Type.INT)){
+								try {
 									datum= new Datum.Int(Integer.parseInt(token));
-								}
-								else if(token.contains("-")){
-									//System.out.println("can be a date");
-									SimpleDateFormat df=new SimpleDateFormat("yyyy-mm-dd");
-									df.setLenient(false);
-									try {
-										df.parse(token);
-										token=token.replace("-","");
-										//System.out.println("the TOKEN is :"+token);
+								} catch (NumberFormatException e) {
+
+									//System.out.println("Not a Integer");
+									if(token.contains("#")){
+										System.out.println("contain #");
+										token=token.substring(token.indexOf("#")+1);
 										datum= new Datum.Int(Integer.parseInt(token));
-									} catch (java.text.ParseException e1) {
-
-										//e1.printStackTrace();
-										System.out.println("Contains \"-\" but not a date");
 									}
+									else if(token.contains("-")){
+										//System.out.println("can be a date");
+										SimpleDateFormat df=new SimpleDateFormat("yyyy-mm-dd");
+										df.setLenient(false);
+										try {
+											df.parse(token);
+											token=token.replace("-","");
+											//System.out.println("the TOKEN is :"+token);
+											datum= new Datum.Int(Integer.parseInt(token));
+										} catch (java.text.ParseException e1) {
 
+											//e1.printStackTrace();
+											System.out.println("Contains \"-\" but not a date");
+										}
+
+									}
+									else
+										e.printStackTrace();
 								}
-								else
-									e.printStackTrace();
+								//Schema.Type t=datum.getType();
+								//System.out.println(t);
 							}
-							//Schema.Type t=datum.getType();
-							//System.out.println(t);
-						}
-						else if(col.type.equals(Schema.Type.FLOAT)){
-							datum= new Flt(Float.parseFloat(token));
-						}
-						else if(col.type.equals(Schema.Type.BOOL)){
-							if(token.equals("True")){
-								datum= Bool.TRUE;
+							else if(col.type.equals(Schema.Type.FLOAT)){
+								datum= new Flt(Float.parseFloat(token));
 							}
-							else{
-								datum=Bool.FALSE;
+							else if(col.type.equals(Schema.Type.BOOL)){
+								if(token.equals("True")){
+									datum= Bool.TRUE;
+								}
+								else{
+									datum=Bool.FALSE;
+								}
 							}
-						}
-						else if(col.type.equals(Schema.Type.STRING)){
-							datum= new Str(token);
-						}
-						arrdatum[j]=datum;
-						j=j+1;
-					}//end of token array
-					lsDatum.add(arrdatum);
-					//lsDatum.get(0)[1].getType();
+							else if(col.type.equals(Schema.Type.STRING)){
+								datum= new Str(token);
+							}
+							arrdatum[j]=datum;
+							j=j+1;
+						}//end of token array
+						lsDatum.add(arrdatum);
+						//lsDatum.get(0)[1].getType();
 
-				}//end of file reading
-				bufferedReader.close();
-				//System.out.println(lsDatum);
-				lsMapGlobalData.put(tablename, lsDatum);
-				lsGlobalData.add(lsDatum);
-				//Schema.Type type=lsGlobalData.get(0).get(0)[0].getType();
-			}catch(FileNotFoundException e){
-				e.printStackTrace();
-			}catch(IOException e){
-				e.printStackTrace();
+					}//end of file reading
+					bufferedReader.close();
+					//System.out.println(lsDatum);
+					lsMapGlobalData.put(tablename, lsDatum);
+					lsGlobalData.add(lsDatum);
+					//Schema.Type type=lsGlobalData.get(0).get(0)[0].getType();
+				}catch(FileNotFoundException e){
+					e.printStackTrace();
+				}catch(IOException e){
+					e.printStackTrace();
+				}
+
 			}
-
-		}
 
 		}
 	}
