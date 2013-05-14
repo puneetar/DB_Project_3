@@ -274,7 +274,8 @@ public class Expression extends ExprTree {
 
 				List<Datum[]> lhs=(new Expression(expr.get(0),data,schemaOfData)).doExpr();
 				List<Datum[]> rhs=(new Expression(expr.get(1),data,schemaOfData)).doExpr();
-
+				
+				if(lhs.size()!=0 && rhs.size()!=0){
 				Datum[] arrLHS=new ManageList(lhs).getColumn(0);
 				Datum[] arrRHS=new ManageList(rhs).getColumn(0);
 
@@ -316,6 +317,7 @@ public class Expression extends ExprTree {
 						if(hash_set_lhs.contains(dat))
 							ret.add(dat);
 					}
+					
 					return ret;
 
 				case BOOL:
@@ -333,7 +335,27 @@ public class Expression extends ExprTree {
 				}
 
 				//			
-
+				}
+				else{
+					if(lhs.size()==0){
+						Iterator<Datum[]> it_rhs=rhs.iterator();
+						Datum[] dat;
+						while(it_rhs.hasNext()){
+							dat=it_rhs.next();
+							ret.add(dat);
+						}
+					}
+					else if(rhs.size()==0){
+						Iterator<Datum[]> it_lhs=lhs.iterator();
+						Datum[] dat;
+						while(it_lhs.hasNext()){
+							dat=it_lhs.next();
+							ret.add(dat);
+						}
+					}
+					return ret;
+				}
+				break;
 			}
 			case OR:  {
 				if(!(expr.size()>=2))

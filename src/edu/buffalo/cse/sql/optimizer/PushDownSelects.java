@@ -50,7 +50,7 @@ public class PushDownSelects extends PlanRewrite{
 						if(ls.size()!=1){
 							boolean bool=joinS(jn,ls,exp);
 							if (bool){
-								//exp.joinflag=true;
+								exp.joinflag=true;
 								lsremove.add(exp);
 								//}
 							}

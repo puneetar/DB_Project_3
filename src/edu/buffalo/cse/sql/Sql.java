@@ -118,7 +118,7 @@ public class Sql {
 	List<Datum[]> f1 = new ArrayList<Datum[]>();
 	List<Datum[]> f = new ArrayList<Datum[]>();
 
-	System.out.println("GLOBAL data made");
+	//System.out.println("GLOBAL data made");
 
 	///----------------------Utkarsh code : Order By
 	List<Datum[]> temp=Utility.switchNodes(q);
