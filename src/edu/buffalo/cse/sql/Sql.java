@@ -104,12 +104,13 @@ public class Sql {
 	public static List<Datum[]> execQuery(Map<String, Schema.TableFromFile> tables,PlanNode q)throws SqlException
 	{	PushDownSelects objPush= new PushDownSelects(true);
 	if(flag_explain==1){
+		System.out.println("===Before===\n");
 		System.out.println(q);
 	}
 	PlanNode newq=objPush.rewrite(q);
 	//System.out.println(newq);
 	if(flag_explain==1){
-		
+		System.out.println("===After===\n");
 		System.out.println(newq);
 	}
 	q=newq;
@@ -263,7 +264,7 @@ public class Sql {
 
 
 	public static void setTpch(){
-		System.out.println("flag TPCH is set =1");
+		//System.out.println("flag TPCH is set =1");
 		flag_TPCH=1;
 	}
 
@@ -471,7 +472,7 @@ public class Sql {
 
 										//System.out.println("Not a Integer");
 										if(token.contains("#")){
-											System.out.println("contain #");
+											//System.out.println("contain #");
 											token=token.substring(token.indexOf("#")+1);
 											datum= new Datum.Int(Integer.parseInt(token));
 										}
@@ -597,7 +598,7 @@ public class Sql {
 
 									//System.out.println("Not a Integer");
 									if(token.contains("#")){
-										System.out.println("contain #");
+										//System.out.println("contain #");
 										token=token.substring(token.indexOf("#")+1);
 										datum= new Datum.Int(Integer.parseInt(token));
 									}

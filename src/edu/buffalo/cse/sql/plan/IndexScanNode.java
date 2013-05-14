@@ -71,7 +71,7 @@ public IndexScanNode(String table, String rangeVariable, Schema.Table schema,Lis
   public List<Schema.Var> getSchemaVars()
   {
 	
-	  System.out.println("hi_test on git");
+	  //System.out.println("hi_test on git");
 	if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
 			setSchemaVars();
 			flag_setSchemaVar=true;

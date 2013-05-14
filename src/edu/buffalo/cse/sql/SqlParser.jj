@@ -83,7 +83,7 @@ void Table(Program p) :
 void setTPCH():
 {}
 { {
-  System.out.println("in TPCH");
+  //System.out.println("in TPCH");
   Sql.setTpch(); }   
 }
 

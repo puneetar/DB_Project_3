@@ -96,8 +96,8 @@ public class Index {
 				TreeMap<Datum, ArrayList<Datum[]>> tree_lsDatum=(TreeMap<Datum, ArrayList<Datum[]>>) ds2.tree_lsDatum;
 				ArrayList<Datum[]> sort_tree_lsDatum=tree_lsDatum.get(get[0]);
 				
-				System.out.println("hi");
-				System.out.println("hi");
+				//System.out.println("hi");
+				//System.out.println("hi");
 				scan=sort_tree_lsDatum.iterator();
 				List <Datum[]> return_list= new ArrayList<Datum[]>();
 				while(scan.hasNext()){

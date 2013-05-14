@@ -128,7 +128,7 @@ public class SqlParser implements SqlParserConstants {
   }
 
   static final public void setTPCH() throws ParseException {
-  System.out.println("in TPCH");
+  //System.out.println("in TPCH");
   Sql.setTpch();
   }
 

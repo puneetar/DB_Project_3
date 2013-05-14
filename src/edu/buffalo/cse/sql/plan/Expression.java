@@ -779,7 +779,7 @@ public class Expression extends ExprTree {
 				List<Datum[]> lhs=(new Expression(expr.get(0),data,schemaOfData)).doExpr();
 				List<Datum[]> rhs=(new Expression(expr.get(1),data,schemaOfData)).doExpr();
 
-				System.out.println("expression");
+				//System.out.println("expression");
 				Datum[] arrLHS=new ManageList(lhs).getColumn(0);
 				Datum[] arrRHS=new ManageList(rhs).getColumn(0);
 

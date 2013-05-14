@@ -75,7 +75,7 @@ public class ScanNode extends PlanNode.Leaf {
 	{
 		
 		if(!flag_setSchemaVar && Sql.flag_hmp_tables_col_used){
-			System.out.println("doing set Schema Vars");
+			//System.out.println("doing set Schema Vars");
 			setSchemaVars();
 			flag_setSchemaVar=true;
 		}

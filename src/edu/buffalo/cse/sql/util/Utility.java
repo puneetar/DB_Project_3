@@ -85,20 +85,20 @@ public class Utility {
 		case PROJECT:{
 			Project objProject= new Project((ProjectionNode)node);
 			col=objProject.findcolumns();
-			System.out.println("hello");
+			//System.out.println("hello");
 			break;
 		}
 		case SELECT:{
 			Select objSelect= new Select((SelectionNode)node);
 			col=objSelect.findcolumns();
 			
-			System.out.println("hello");
+			//System.out.println("hello");
 			break;
 		}
 		case AGGREGATE:{
 			Aggregate objAggregate= new Aggregate((AggregateNode)node);
 			col=objAggregate.findcolumns();
-			System.out.println("hello");
+			//System.out.println("hello");
 			break;
 		}
 		case JOIN:{
