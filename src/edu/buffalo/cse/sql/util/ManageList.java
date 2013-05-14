@@ -56,9 +56,9 @@ public class ManageList {
 
 	public List<Datum[]> toListOfDatumArray(Datum[] arr){
 		ArrayList<Datum[]> ret=new ArrayList<Datum[]>();
-		
+		Datum[] a;
 		for(Datum d :arr){
-			Datum[] a=new Datum[1];
+			a=new Datum[1];
 			a[0]=d;
 			ret.add(a);
 		}

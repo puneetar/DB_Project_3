@@ -49,26 +49,19 @@ public class Sql {
 	public static HashMap<String,String> tablemap= new HashMap<String,String>();
 
 	public static int flag_index=0;
-	public static int flag_explain=0;
 
 	public static void main( String[] args )
 	{
-		String filename=null;
+
 		for(String arg: args){
 			if(arg.equalsIgnoreCase("-index")){
 				flag_index=1;
-				//break;
-			}
-			else if(arg.equalsIgnoreCase("-explain")){
-				flag_explain=1;
-			}
-			else{
-				filename=arg;
+				break;
 			}
 		}
 
 		try {
-			List<List<Datum[]>> result=Sql.execFile(new File(filename));
+			List<List<Datum[]>> result=Sql.execFile(new File(flag_index==1?args[1]:args[0]));
 
 			TableBuilder output = new TableBuilder();
 			//			    for(Schema.Column c : querySchema){
@@ -101,13 +94,8 @@ public class Sql {
 
 	public static List<Datum[]> execQuery(Map<String, Schema.TableFromFile> tables,PlanNode q)throws SqlException
 	{	PushDownSelects objPush= new PushDownSelects(true);
-
-	PlanNode newq=objPush.rewrite(q);
-	if(flag_explain==1){
-		System.out.println(q);
-		System.out.println(newq);
-	}
 	System.out.println(q);
+	PlanNode newq=objPush.rewrite(q);
 	System.out.println(newq);
 	q=newq;
 	globalData(tables,q);
@@ -216,28 +204,6 @@ public class Sql {
 		f1 = f;
 	else
 		f1 = f.subList(0, flag_limit);
-	//----------------UTKARSH code : end Order By && LIMIT
-
-	//	TableBuilder output = new TableBuilder();
-	//	List<Schema.Var> list=q.getSchemaVars();
-	//	Iterator<Schema.Var> it=list.iterator();
-	//	while(it.hasNext()){
-	//		Schema.Var sc=it.next();
-	//		// output.newCell(sc.name);
-	//		System.out.println(sc.name+" : "+sc.rangeVariable);
-	//	}
-	//	Iterator<Datum[]> resultIterator=f1.iterator();
-	//
-	//	output.addDividerLine();
-	//	while(resultIterator.hasNext()){
-	//		Datum[] row = resultIterator.next();
-	//		output.newRow();
-	//		for(Datum d : row){
-	//			output.newCell(d.toString());
-	//		}
-	//	}
-	//
-	//	System.out.println(output.toString());
 	flag_hmp_tables_col_used=false;
 
 
@@ -248,10 +214,9 @@ public class Sql {
 	public static List<List<Datum[]>> execFile(File program)throws SqlException, FileNotFoundException, ParseException
 	{
 		SqlParser sp = new SqlParser(new FileReader(program));
-		//Object[] o = new Object[2];
 		Program o = SqlParser.Program();
 		List<List<Datum[]>> fin=new ArrayList<List<Datum[]>>();
-		//ArrayList<PlanNode> a1=(ArrayList<PlanNode>)o[1];
+
 		Iterator<PlanNode> it=o.queries.iterator();
 
 		while(it.hasNext()){
@@ -358,32 +323,48 @@ public class Sql {
 				try {
 					if(lsic.size()>0){
 						Iterator<IndexCondition> it_lsic=lsic.iterator();
-						int arr_key[]=new int[lsic.size()];
+						int arr_index[]=new int[lsic.size()];
 						Datum arr_value[]=new Datum[lsic.size()];
-						ExprTree.OpCode arr_opCode[]=new ExprTree.OpCode[lsic.size()]; 
+						ExprTree.OpCode arr_opCode[]=new ExprTree.OpCode[lsic.size()];
+						int key_For_ISAM=-1;
 						int i=0;
+
 						while(it_lsic.hasNext()){
-							arr_key[i++]=it_lsic.next().getIndex();
-							arr_value[i++]=it_lsic.next().getValue();
-							arr_opCode[i++]=it_lsic.next().getOpCode();
+							IndexCondition index_cond=it_lsic.next();
+							arr_index[i]=index_cond.getIndex();
+							arr_value[i]=index_cond.getValue();
+							arr_opCode[i++]=index_cond.getOpCode();
+							if(index_cond.getOpCode()==ExprTree.OpCode.LT){
+								key_For_ISAM=i-1;
+							}else if(index_cond.getOpCode()==ExprTree.OpCode.LTE && key_For_ISAM==-1){
+								key_For_ISAM=i-1;
+							}
 						}
-						Index.createIndex(tf, findType(lsic.get(0).getOpCode()), arr_key);
+
 
 						switch(findType(lsic.get(0).getOpCode())){
 						case HASH:
-							List<Datum[]> lsIndexDatum=Index.getFromIndex(tf, IndexType.HASH, arr_key, arr_value);
+							Index.createIndex(tf, IndexType.HASH, arr_index);
+							List<Datum[]> lsIndexDatum=Index.getFromIndex(tf, IndexType.HASH, arr_index, arr_value);
 							lsMapGlobalData.put(tablename, lsIndexDatum);
 							lsGlobalData.add(lsIndexDatum);
 							break;
 						case ISAM:
-							//								if(lsic.size()==2){
-							//									
-							//								}
-							//								else if(lsic.size()==1){
-							//									
-							//								}
+							Index.createIndex(tf, IndexType.ISAM, new int[]{arr_index[key_For_ISAM]});
+							lsic.remove(key_For_ISAM);
+							Datum datum_to[]=new Datum[1]; 
+
+							if(arr_opCode[key_For_ISAM]==ExprTree.OpCode.LTE)
+								datum_to[0]=new Datum.Int(arr_value[key_For_ISAM].toInt()+1);	
+							else
+								datum_to[0]=arr_value[key_For_ISAM];
 
 
+							List<Datum[]> lsIndexDatum_isam=Index.scanFromIndex(tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
+							lsIndexDatum_isam=applyOtherConditions(lsic,lsIndexDatum_isam);
+
+							lsMapGlobalData.put(tablename, lsIndexDatum_isam);
+							lsGlobalData.add(lsIndexDatum_isam);
 							break;
 						default:
 							break;
@@ -623,6 +604,43 @@ public class Sql {
 			}
 
 		}
+	}
+
+	private static List<Datum[]> applyOtherConditions(List<IndexCondition> lsic,	List<Datum[]> lsIndexDatum_isam) {
+
+		Iterator<IndexCondition> it_lsic=lsic.iterator();
+		int arr_index[]=new int[lsic.size()];
+		Datum arr_value[]=new Datum[lsic.size()];
+		ExprTree.OpCode arr_opCode[]=new ExprTree.OpCode[lsic.size()];
+
+		int i=0;
+
+		while(it_lsic.hasNext()){
+			IndexCondition index_cond=it_lsic.next();
+			arr_index[i]=index_cond.getIndex();
+			arr_value[i]=index_cond.getValue();
+			arr_opCode[i++]=index_cond.getOpCode();
+		}
+
+		Iterator<Datum[]> it_lsIndexDatum_isam=lsIndexDatum_isam.iterator();
+		List<Datum[]> return_list=new ArrayList<Datum[]>();
+		while(it_lsIndexDatum_isam.hasNext()){
+			Datum[] d=it_lsIndexDatum_isam.next();
+			for(int i1=0;i1<arr_index.length;i1++){
+				if(d[arr_index[i1]].applyOperation(arr_opCode[i1], arr_value[i1]))
+				{
+					if(i1==arr_index.length)
+						return_list.add(d);
+					else
+						continue;
+				}
+				else{
+					break;
+				}
+			}
+		}
+
+		return return_list;
 	}
 
 	//changes for Phase 3:starts

@@ -6,6 +6,7 @@ import java.util.Stack;
 
 import edu.buffalo.cse.sql.SqlException;
 import edu.buffalo.cse.sql.Schema;
+import edu.buffalo.cse.sql.plan.ExprTree;
 
 public abstract class Datum implements Comparator<Datum[]>, Comparable<Datum>{  
 	public abstract String toString();
@@ -27,9 +28,6 @@ public abstract class Datum implements Comparator<Datum[]>, Comparable<Datum>{
 		catch (ClassCastException e) { return false; }
 	}
 	@Override
-//	public int compare(Datum arg0, Datum arg1) {
-//		return arg0.compareTo(arg1);
-//	}
 	 public int compare(Datum[] a, Datum[] b){
 		    return Datum.compareRows(a, b);
 		  }
@@ -117,6 +115,27 @@ public abstract class Datum implements Comparator<Datum[]>, Comparable<Datum>{
 			super("Cast Error " + from + " -> " + to);
 			this.from = from; this.to = to;
 		}
+	}
+	
+	public boolean applyOperation(ExprTree.OpCode op, Datum datum){
+		
+		switch(op){
+		case EQ:
+			return this.compareTo(datum)==0?true:false;
+		case GTE:
+			return this.compareTo(datum)>=0?true:false;
+		case GT:
+			return this.compareTo(datum)>0?true:false;
+		case LTE:
+			return this.compareTo(datum)<=0?true:false;
+		case LT:
+			return this.compareTo(datum)<0?true:false;
+		default:
+			System.out.println("*****UNKNOWN OPERATION in applyOperation()");
+			break;
+		}
+		
+		return false;
 	}
 
 	public static class Int extends Datum {
