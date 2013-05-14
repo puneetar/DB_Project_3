@@ -94,7 +94,9 @@ public class Sql {
 
 	public static List<Datum[]> execQuery(Map<String, Schema.TableFromFile> tables,PlanNode q)throws SqlException
 	{	PushDownSelects objPush= new PushDownSelects(true);
-	PlanNode newq=objPush.rewrite(q);  
+	System.out.println(q);
+	PlanNode newq=objPush.rewrite(q);
+	System.out.println(newq);
 	q=newq;
 	globalData(tables,q);
 

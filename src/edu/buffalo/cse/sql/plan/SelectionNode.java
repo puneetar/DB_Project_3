@@ -28,8 +28,17 @@ public class SelectionNode extends PlanNode.Unary {
   public ExprTree getCondition() { return condition; }
   
   public String detailString()
-      { return super.detailString() + "[" + 
-  condition.toString() + "]"; }
+      { 
+	  if(condition!=null && !condition.isEmpty()){
+	  
+	  return super.detailString() + "[" + 
+  condition.toString() + "]"; 
+      }
+  else{
+	  //return super.detailString() + "";
+	  return "";
+  }
+  }
   
   public Collection<ExprTree> conjunctiveClauses() 
   {
