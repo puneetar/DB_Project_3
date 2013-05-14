@@ -202,9 +202,9 @@ public class Sql {
 				}
 				else{
 					if(orderByMap.get(col1)==1)
-						finalMapdec.put(entry.getKey(), newDatumList);
+						finalMapdec.put(entry.getKey(), entry.getValue());
 					else
-						finalMapinc.put(entry.getKey(), newDatumList);
+						finalMapinc.put(entry.getKey(), entry.getValue());
 				}
 			}
 			if(orderByMap.get(col1)==1)
