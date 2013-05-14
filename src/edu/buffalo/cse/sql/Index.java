@@ -51,7 +51,7 @@ public class Index {
 		int indexSize = ds.getRowCount()/10;
 		switch(type){
 		case HASH:
-			HashIndex.create(fm, idxFile, ds, keySpec, indexSize);
+		//	HashIndex.create(fm, idxFile, ds, keySpec, indexSize);
 			break;
 		case ISAM:
 			ISAMIndex.create(fm, idxFile, ds, keySpec);
@@ -141,18 +141,23 @@ public class Index {
 				idx = new ISAMIndex(file, keySpec);
 				break;
 			}
-			Iterator<Datum[]> scan;
+			
+			TreeMap<Datum[], ArrayList<Datum[]>> tree_lsDatum=(TreeMap<Datum[], ArrayList<Datum[]>>) ds2.tree_lsDatum;
+			SortedMap<Datum[], ArrayList<Datum[]>> sort_tree_lsDatum = null;
+			
+			Iterator<Datum[]> scan = null;
+			
 			if(from == null||from.length<1){
 				if(to == null){ scan = idx.scan(); }
-				else { scan = idx.rangeScanTo(to); }
+				else { sort_tree_lsDatum=tree_lsDatum.headMap(to); }
 			} else {
-				if(to == null){ scan = idx.rangeScanFrom(from); }
+				if(to == null||to.length<1){ sort_tree_lsDatum=tree_lsDatum.tailMap(from); }
 				else { scan = idx.rangeScan(from,to); }
 			}
 			
 			try {
-				TreeMap<Datum[], ArrayList<Datum[]>> tree_lsDatum=(TreeMap<Datum[], ArrayList<Datum[]>>) ds2.tree_lsDatum;
-				SortedMap<Datum[], ArrayList<Datum[]>> sort_tree_lsDatum=tree_lsDatum.headMap(to);
+				
+				
 				Iterator<ArrayList<Datum[]>> it_ArrayList=sort_tree_lsDatum.values().iterator();
 				ArrayList<Datum[]> arr_final=new ArrayList<Datum[]>();
 				while(it_ArrayList.hasNext()){
