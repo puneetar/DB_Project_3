@@ -349,13 +349,14 @@ public class Sql {
 					}
 					try {
 						
-						Index.createIndex(tf, findType(type), arr);
-						if(findType(type)==IndexType.HASH){
-							//Index.getFromIndex(tf, findType(type), arr, get)
-						}
-						else if(findType(type)==IndexType.ISAM){
-							
-						}
+						Index.createIndex(tf, findType(op), arr);
+						
+//						if(findType(type)==IndexType.HASH){
+//							//Index.getFromIndex(tf, findType(type), arr, get)
+//						}
+//						else if(findType(type)==IndexType.ISAM){
+//							
+//						}
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

@@ -47,6 +47,7 @@ import edu.buffalo.cse.sql.data.Datum;
 import edu.buffalo.cse.sql.data.Datum.Bool;
 import edu.buffalo.cse.sql.data.Datum.Flt;
 import edu.buffalo.cse.sql.data.Datum.Str;
+import edu.buffalo.cse.sql.data.DatumCompare;
 
 public class TestDataStream implements Iterator<Datum[]> {
 
@@ -57,8 +58,8 @@ public class TestDataStream implements Iterator<Datum[]> {
 	int chaos;
 	TableFromFile tableFromFile;
 	
-	Map<Datum, Datum[]> tree_lsDatum= new TreeMap<Datum, Datum[]>();
-	Iterator<Entry<Datum, Datum[]>> it_tree_lsDatum;
+	Map<Datum[], Datum[]> tree_lsDatum= new TreeMap<Datum[], Datum[]>(new DatumCompare());
+	Iterator<Entry<Datum[], Datum[]>> it_tree_lsDatum;
 
 	public TestDataStream(int keys, int values, int rows)
 	{ 
@@ -73,7 +74,7 @@ public class TestDataStream implements Iterator<Datum[]> {
 		if(this.tableFromFile!=null){
 			try {
 				readTableFromFile();
-				Set<Entry<Datum, Datum[]>> set=tree_lsDatum.entrySet();
+				Set<Entry<Datum[], Datum[]>> set=tree_lsDatum.entrySet();
 				it_tree_lsDatum=set.iterator();
 			//	it_lsDatum=lsDatum.iterator();
 			} catch (NumberFormatException e) {
@@ -179,8 +180,14 @@ public class TestDataStream implements Iterator<Datum[]> {
 				arrdatum[i]=datum;
 			}
 			
+Datum key[]=new Datum[this.keyCols.length];
 			
-			tree_lsDatum.put(arrdatum[keyCols[0]], arrdatum);
+			int j=0;
+			for(int i:this.keyCols)
+				key[j++]=arrdatum[i];
+			
+			tree_lsDatum.put(key, arrdatum);
+			//tree_lsDatum.put(arrdatum[keyCols[0]], arrdatum);
 		//	lsDatum.add(arrdatum);
 		}
 		bufferedReader.close();
