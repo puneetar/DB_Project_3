@@ -36,9 +36,9 @@ public class Index {
 	}
 
 
-	public static TestDataStream createIndex(TableFromFile tableFromFile, IndexType type, int keyCols[]) throws Exception
+	public static TestDataStream createIndex(TableFromFile tableFromFile, IndexType type, int keyCols) throws Exception
 	{
-		int numOfkeys = keyCols.length;
+		int numOfkeys = 1;
 		int frames = 100;
 
 		File idxFile = new File("index"+"_"+type+"_"+tableFromFile.getFile());
@@ -64,9 +64,9 @@ public class Index {
 		return ds;
 	}	
 
-	public static List<Datum[]> getFromIndex(TestDataStream ds2,TableFromFile tableFromFile, IndexType type, int keyCols[],Datum get[]) throws Exception
+	public static List<Datum[]> getFromIndex(TestDataStream ds2,TableFromFile tableFromFile, IndexType type, int keyCols,Datum get[]) throws Exception
 	{
-		int numOfkeys = keyCols.length;
+		int numOfkeys = 1;
 		int frames = 100;
 		File idxFile = new File("index"+"_"+type+"_"+tableFromFile.getFile());
 
@@ -93,8 +93,11 @@ public class Index {
 			}
 			Iterator<Datum[]> scan = null;
 			try {
-				TreeMap<Datum[], ArrayList<Datum[]>> tree_lsDatum=(TreeMap<Datum[], ArrayList<Datum[]>>) ds2.tree_lsDatum;
-				ArrayList<Datum[]> sort_tree_lsDatum=tree_lsDatum.get(get);
+				TreeMap<Datum, ArrayList<Datum[]>> tree_lsDatum=(TreeMap<Datum, ArrayList<Datum[]>>) ds2.tree_lsDatum;
+				ArrayList<Datum[]> sort_tree_lsDatum=tree_lsDatum.get(get[0]);
+				
+				System.out.println("hi");
+				System.out.println("hi");
 				scan=sort_tree_lsDatum.iterator();
 				List <Datum[]> return_list= new ArrayList<Datum[]>();
 				while(scan.hasNext()){
@@ -112,9 +115,9 @@ public class Index {
 		return null;
 	}
 
-	public static List<Datum[]> scanFromIndex(TestDataStream ds2, TableFromFile tableFromFile, IndexType type, int keyCols[],Datum from[],Datum to[]) throws Exception
+	public static List<Datum[]> scanFromIndex(TestDataStream ds2, TableFromFile tableFromFile, IndexType type, int keyCols,Datum from[],Datum to[]) throws Exception
 	{
-		int numOfkeys = keyCols.length;
+		int numOfkeys = 1;
 		int frames = 100;
 
 		File idxFile = new File("index"+"_"+type+"_"+tableFromFile.getFile());
@@ -142,16 +145,16 @@ public class Index {
 				break;
 			}
 			
-			TreeMap<Datum[], ArrayList<Datum[]>> tree_lsDatum=(TreeMap<Datum[], ArrayList<Datum[]>>) ds2.tree_lsDatum;
-			SortedMap<Datum[], ArrayList<Datum[]>> sort_tree_lsDatum = null;
+			TreeMap<Datum, ArrayList<Datum[]>> tree_lsDatum=(TreeMap<Datum, ArrayList<Datum[]>>) ds2.tree_lsDatum;
+			SortedMap<Datum, ArrayList<Datum[]>> sort_tree_lsDatum = null;
 			
 			Iterator<Datum[]> scan = null;
 			
 			if(from == null||from.length<1){
 				if(to == null){ scan = idx.scan(); }
-				else { sort_tree_lsDatum=tree_lsDatum.headMap(to); }
+				else { sort_tree_lsDatum=tree_lsDatum.headMap(to[0]); }
 			} else {
-				if(to == null||to.length<1){ sort_tree_lsDatum=tree_lsDatum.tailMap(from); }
+				if(to == null||to.length<1){ sort_tree_lsDatum=tree_lsDatum.tailMap(from[0]); }
 				else { scan = idx.rangeScan(from,to); }
 			}
 			

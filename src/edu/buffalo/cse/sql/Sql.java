@@ -384,14 +384,14 @@ public class Sql {
 
 						switch(findType(lsic.get(0).getOpCode())){
 						case HASH:
-							TestDataStream ds=Index.createIndex(tf, IndexType.HASH, arr_index);
-							List<Datum[]> lsIndexDatum=Index.getFromIndex(ds,tf, IndexType.HASH, arr_index, arr_value);
+							TestDataStream ds=Index.createIndex(tf, IndexType.HASH, arr_index[0]);
+							List<Datum[]> lsIndexDatum=Index.getFromIndex(ds,tf, IndexType.HASH, arr_index[0], arr_value);
 							List<Datum[]> lsnewDatum_Hash=removeColumns(lsIndexDatum,hmp,lscolumn,tablename);
 							lsMapGlobalData.put(tablename, lsnewDatum_Hash);
 							lsGlobalData.add(lsnewDatum_Hash);
 							break;
 						case ISAM:
-							TestDataStream ds1=Index.createIndex(tf, IndexType.ISAM, new int[]{arr_index[key_For_ISAM]});
+							TestDataStream ds1=Index.createIndex(tf, IndexType.ISAM, arr_index[key_For_ISAM]);
 							lsic.remove(key_For_ISAM);
 							Datum datum_to[]=new Datum[1]; 
 							Datum datum_from[]=new Datum[1];
@@ -400,17 +400,17 @@ public class Sql {
 							if(arr_opCode[key_For_ISAM]==ExprTree.OpCode.LTE)
 							{
 								datum_to[0]=new Datum.Int(arr_value[key_For_ISAM].toInt()+1);
-								lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
+								lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  arr_index[key_For_ISAM],new Datum[0],datum_to );
 							}	
 							else if(arr_opCode[key_For_ISAM]==ExprTree.OpCode.LT)
 							{
 								datum_to[0]=arr_value[key_For_ISAM];
-								lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
+								lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM, arr_index[key_For_ISAM],new Datum[0],datum_to );
 							}
 							else if(arr_opCode[key_For_ISAM]==ExprTree.OpCode.GT)
 							{
 								datum_from[0]=arr_value[key_For_ISAM];
-								lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},datum_from,new Datum[0] );
+								lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM, arr_index[key_For_ISAM],datum_from,new Datum[0] );
 							}
 
 							
