@@ -33,8 +33,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeMap;
 
 import edu.buffalo.cse.sql.Schema;
@@ -45,6 +47,7 @@ import edu.buffalo.cse.sql.data.Datum;
 import edu.buffalo.cse.sql.data.Datum.Bool;
 import edu.buffalo.cse.sql.data.Datum.Flt;
 import edu.buffalo.cse.sql.data.Datum.Str;
+import edu.buffalo.cse.sql.data.DatumCompare;
 
 public class TestDataStream implements Iterator<Datum[]> {
 
@@ -54,17 +57,9 @@ public class TestDataStream implements Iterator<Datum[]> {
 	int[] keyCols;
 	int chaos;
 	TableFromFile tableFromFile;
-	boolean guaranteeKeyStep;
-	Random rand;
 	
-	List<Datum[]> lsDatum= new ArrayList<Datum[]>();
-	Iterator<Datum[]> it_lsDatum;
-	
-	Map<Datum[], Datum[]> tree_lsDatum= new TreeMap<Datum[], Datum[]>();
-			//new TreeMap<Datum[],Datum[]>();
-	
-	Iterator<Datum[]> it_tree_lsDatum;
-
+	Map<Datum[], Datum[]> tree_lsDatum= new TreeMap<Datum[], Datum[]>(new DatumCompare());
+	Iterator<Entry<Datum[], Datum[]>> it_tree_lsDatum;
 
 	public TestDataStream(int keys, int values, int rows)
 	{ 
@@ -79,6 +74,8 @@ public class TestDataStream implements Iterator<Datum[]> {
 		if(this.tableFromFile!=null){
 			try {
 				readTableFromFile();
+				Set<Entry<Datum[], Datum[]>> set=tree_lsDatum.entrySet();
+				it_tree_lsDatum=set.iterator();
 			//	it_lsDatum=lsDatum.iterator();
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
@@ -86,13 +83,10 @@ public class TestDataStream implements Iterator<Datum[]> {
 				e.printStackTrace();
 			}
 		}
-		this.rows = lsDatum.size();
-		this.values = lsDatum.size() > 0 ? lsDatum.get(0).length-noOfKeys : 0;
+		this.rows = tree_lsDatum.size();
+	//	this.values = tree_lsDatum.size() > 0 ? tree_lsDatum.get(0).length-noOfKeys : 0;
 		this.curr = new int[noOfKeys];
 		this.chaos = chaos;
-		this.guaranteeKeyStep = guaranteeKeyStep; 
-		//		for(int i = 0; i < this.curr.length; i++){ this.curr[i] = 0; }
-		//		rand = new Random(52982);
 	}
 
 	public Schema.Type[] getSchema()
@@ -102,17 +96,17 @@ public class TestDataStream implements Iterator<Datum[]> {
 
 	public boolean hasNext()
 	{
-		return it_lsDatum.hasNext();
+		return it_tree_lsDatum.hasNext();
 		//return tree_lsDatum.hasNext();
 	}
 
 	public Datum[] next()
 	{
-		return it_lsDatum.next();
+		return it_tree_lsDatum.next().getValue();
 	}
 
 	public int getRowCount(){
-		return lsDatum.size();
+		return tree_lsDatum.size();
 	}
 
 	public void remove()
@@ -125,7 +119,7 @@ public class TestDataStream implements Iterator<Datum[]> {
 
 		BufferedReader bufferedReader = new BufferedReader(new FileReader(tableFromFile.getFile()));
 		String data;
-		while ((data = bufferedReader.readLine()) != null){ //reading each table
+		while ((data = bufferedReader.readLine()) != null){ 
 			String arrtoken[];
 
 			if(Sql.flag_TPCH==0){
@@ -186,12 +180,14 @@ public class TestDataStream implements Iterator<Datum[]> {
 				arrdatum[i]=datum;
 			}
 			
-			Datum key[]=new Datum[this.keyCols.length];
+Datum key[]=new Datum[this.keyCols.length];
+			
 			int j=0;
 			for(int i:this.keyCols)
 				key[j++]=arrdatum[i];
 			
 			tree_lsDatum.put(key, arrdatum);
+			//tree_lsDatum.put(arrdatum[keyCols[0]], arrdatum);
 		//	lsDatum.add(arrdatum);
 		}
 		bufferedReader.close();
