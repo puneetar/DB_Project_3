@@ -36,8 +36,10 @@ public class Select extends SelectionNode{
 		schemaForExp = s.getChild().getSchemaVars(); 
 		System.out.println();
 		if(s.condition!=null && !s.condition.isEmpty()){
-			List<Datum[]> lsdatum = new Expression(s.condition,dataForExp,schemaForExp).doExpr();	
+			List<Datum[]> lsdatum = new Expression(s.condition,dataForExp,schemaForExp).doExpr();
+			
 			return lsdatum;
+			
 		}
 		else{
 			return dataForExp;

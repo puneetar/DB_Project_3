@@ -53,6 +53,7 @@ public class Join extends JoinNode {
 		}
 		else{	//code for hybrid hash join
 			ExprTree exp=join.getCondition();
+			exp.joinflag=true;
 			List ls=new Expression(exp).findColumns();
 			List<Schema.Var> lsvar1=join.getLHS().getSchemaVars();
 			System.out.println();
@@ -108,7 +109,7 @@ public class Join extends JoinNode {
 		List<Datum[]> lsfinalDatum = new ArrayList<Datum[]>();
 		//int r=lhs.get(0).length;
 		//int m=rhs.get(0).length;
-		if(lhs.size()<=rhs.size()){
+		if(lhs.size()>=rhs.size()){
 			primary = lhs;
 			secondary = rhs;
 			idx1 = i;
@@ -122,7 +123,14 @@ public class Join extends JoinNode {
 		}
 		HashMap<Datum, ArrayList<Datum[]>> hhj = new HashMap<Datum, ArrayList<Datum[]>>();
 		Iterator<Datum[]> it1 = primary.iterator();
+		int k2=0;
+		int num=0;
 		while(it1.hasNext()){			//Putting values in HashMap
+			num=num+1;
+//			if(num==k2+1000){
+//				k2=k2+1000;
+//				System.out.println("I am here:" + num );
+//			}
 			Datum[] row = it1.next();
 			if(hhj.containsKey(row[idx1])){
 				ArrayList<Datum[]> temp = hhj.get(row[idx1]);
@@ -135,9 +143,8 @@ public class Join extends JoinNode {
 			}
 		}
 		Iterator<Datum[]> it2 = secondary.iterator();
-		int num=0;
+		num=0;
 		int k1=0;
-		int k2=0;
 		//Datum[] res = new Datum[r+m];
 		while(it2.hasNext()){		
 			Datum[] row = it2.next();
@@ -148,16 +155,13 @@ public class Join extends JoinNode {
 				ArrayList<Datum[]> temp = hhj.get(row[idx2]);
 				Iterator<Datum[]> it3 = temp.iterator();
 				while(it3.hasNext()){
-					if(num==k1+1000){
-						k1=k1+1000;
-						System.out.println("Join:" + num);
-					}
-					if(num==k2+50000){
-						k2=k2+50000;
-						System.out.println("I am here");
-					}
+//					if(num==k1+1000){
+//						k1=k1+1000;
+//						System.out.println("Join:" + num);
+//					}
+					
 					Datum[] matchedRow = it3.next();
-					if(lhs.size()<=rhs.size()){
+					if(lhs.size()>=rhs.size()){
 						res= new Datum[row.length + matchedRow.length];
 						for(int k=0;k<matchedRow.length;k++)
 							res[k] = matchedRow[k];

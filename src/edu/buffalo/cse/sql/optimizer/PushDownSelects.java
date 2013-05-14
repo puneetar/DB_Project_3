@@ -39,16 +39,18 @@ public class PushDownSelects extends PlanRewrite{
 			java.util.List<ExprTree> lsnotremove=new java.util.ArrayList<ExprTree>();
 			while(itcon.hasNext()){
 				ExprTree exp=itcon.next();
+				List ls=new Expression(exp).findColumns();
 				switch(exp.op){
 				case EQ:{
 					if(objSelect.getChild().type==PlanNode.Type.JOIN){
 						JoinNode jn=(JoinNode) objSelect.getChild();
 						//if(jn.getJoinType()==JType.NLJ){
 
-						List ls=new Expression(exp).findColumns();
+
 						if(ls.size()!=1){
 							boolean bool=joinS(jn,ls,exp);
 							if (bool){
+								//exp.joinflag=true;
 								lsremove.add(exp);
 								//}
 							}
@@ -63,7 +65,7 @@ public class PushDownSelects extends PlanRewrite{
 				case GTE:
 				case LTE:
 				case NEQ:{
-					List ls=new Expression(exp).findColumns();
+					//List ls=new Expression(exp).findColumns();
 					if(ls.size()==1){
 						if(Sql.flag_index==1){
 							PlanNode node1=objSelect.getChild();
@@ -71,7 +73,6 @@ public class PushDownSelects extends PlanRewrite{
 								lsremove.add(exp);
 							}
 						}
-
 					}
 					break;
 				}
@@ -107,12 +108,10 @@ public class PushDownSelects extends PlanRewrite{
 										if(objSelect.getCondition()!=null || !objSelect.getCondition().isEmpty()){
 											ExprTree.OpCode op=objSelect.getCondition().get(0).op;
 											objSelect.setCondition(objSelect.getCondition().get(0));
-											objSelect.getCondition().remove(expremove);
+
+											if(objSelect.getCondition().remove(expremove));
 											op=objSelect.getCondition().get(0).op;
 											objSelect.setCondition(objSelect.getCondition().get(0));
-											//objSelect.getCondition().op=op;
-											System.out.println("");
-
 										}
 									}
 								}
