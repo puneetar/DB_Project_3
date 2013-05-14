@@ -50,19 +50,27 @@ public class Sql {
 	public static HashMap<String,String> tablemap= new HashMap<String,String>();
 
 	public static int flag_index=0;
+	public static int flag_explain=0;
 
 	public static void main( String[] args )
 	{
+		String filename=null;
 
 		for(String arg: args){
 			if(arg.equalsIgnoreCase("-index")){
 				flag_index=1;
 				break;
 			}
+			else if(arg.equalsIgnoreCase("-explain")){
+				flag_explain=1;
+			}
+			else{
+				filename=arg;
+			}
 		}
 
 		try {
-			List<List<Datum[]>> result=Sql.execFile(new File(flag_index==1?args[1]:args[0]));
+			List<List<Datum[]>> result=Sql.execFile(new File(filename));
 
 			TableBuilder output = new TableBuilder();
 			//			    for(Schema.Column c : querySchema){
@@ -95,12 +103,15 @@ public class Sql {
 
 	public static List<Datum[]> execQuery(Map<String, Schema.TableFromFile> tables,PlanNode q)throws SqlException
 	{	PushDownSelects objPush= new PushDownSelects(true);
-	System.out.println(q);
+	//System.out.println(q);
 	PlanNode newq=objPush.rewrite(q);
-	System.out.println(newq);
+	//System.out.println(newq);
 	q=newq;
 	globalData(tables,q);
-
+	if(flag_explain==1){
+		System.out.println(q);
+		System.out.println(newq);
+	}
 	List<Datum[]> f1 = new ArrayList<Datum[]>();
 	List<Datum[]> f = new ArrayList<Datum[]>();
 
@@ -108,6 +119,7 @@ public class Sql {
 
 	///----------------------Utkarsh code : Order By
 	List<Datum[]> temp=Utility.switchNodes(q);
+
 	if(orderByMap.isEmpty()){
 		f = temp;
 	}

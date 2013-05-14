@@ -45,7 +45,7 @@ public class ExprTree extends ArrayList<ExprTree> {
   }
   
   public final OpCode op;
-  
+  public boolean joinflag=false;
   public ExprTree(OpCode op) { this.op = op; }
   public ExprTree(OpCode op, ExprTree child) { this(op); add(child); }
   public ExprTree(OpCode op, ExprTree lhs, ExprTree rhs) 
@@ -62,8 +62,10 @@ public class ExprTree extends ArrayList<ExprTree> {
     }
     StringBuilder sb = new StringBuilder("(");
     for(ExprTree e : this){
+    	if(!e.joinflag){
       if(first){ first = false; } else { sb.append(" "+op.sep+" "); }
       sb.append(e.toString());
+    	}
     }
     sb.append(")");
     return sb.toString();
