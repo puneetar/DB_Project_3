@@ -359,8 +359,9 @@ public class Sql {
 						case HASH:
 							TestDataStream ds=Index.createIndex(tf, IndexType.HASH, arr_index);
 							List<Datum[]> lsIndexDatum=Index.getFromIndex(ds,tf, IndexType.HASH, arr_index, arr_value);
-							lsMapGlobalData.put(tablename, lsIndexDatum);
-							lsGlobalData.add(lsIndexDatum);
+							List<Datum[]> lsnewDatum_Hash=removeColumns(lsIndexDatum,hmp,lscolumn,tablename);
+							lsMapGlobalData.put(tablename, lsnewDatum_Hash);
+							lsGlobalData.add(lsnewDatum_Hash);
 							break;
 						case ISAM:
 							TestDataStream ds1=Index.createIndex(tf, IndexType.ISAM, new int[]{arr_index[key_For_ISAM]});
@@ -375,10 +376,10 @@ public class Sql {
 
 							List<Datum[]> lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
 							if(lsic.size()>0)
-							lsIndexDatum_isam=applyOtherConditions(lsic,lsIndexDatum_isam);
-
-							lsMapGlobalData.put(tablename, lsIndexDatum_isam);
-							lsGlobalData.add(lsIndexDatum_isam);
+								lsIndexDatum_isam=applyOtherConditions(lsic,lsIndexDatum_isam);
+							List<Datum[]> lsnewDatum_isam=removeColumns(lsIndexDatum_isam,hmp,lscolumn,tablename);
+							lsMapGlobalData.put(tablename, lsnewDatum_isam);
+							lsGlobalData.add(lsnewDatum_isam);
 							break;
 						default:
 							break;
@@ -758,5 +759,40 @@ public class Sql {
 		}
 		return f;
 
+	}
+
+	public static List<Datum[]> removeColumns(List<Datum[]> lsDatum,HashMap hmp, List<Schema.Column> lscolumn, String tablename ){
+		Iterator itlscolumn=lscolumn.iterator();
+		int index=-1;
+		List<Integer> lsIndex= new ArrayList<Integer>();
+
+		while(itlscolumn.hasNext()){
+			index=index+1;
+			Schema.Column column=(Column) itlscolumn.next();
+			if(!hmp.isEmpty()&& !findColName(hmp,tablename,column.name.name) )
+				continue;
+			else{
+				lsIndex.add(index);
+			}
+		}
+		Iterator<Integer> ilsIndex=lsIndex.iterator();
+		List<Datum[]> newls= new ArrayList<Datum[]>();
+		int i=0;
+		int j=0;
+		Iterator<Datum[]> itrDatum= lsDatum.iterator();
+		while(itrDatum.hasNext()){
+			Datum[] oldd= itrDatum.next();
+			Datum[] newd=new Datum[lsIndex.size()];
+			ilsIndex=lsIndex.iterator();
+			j=0;
+			while(ilsIndex.hasNext()){
+				i=ilsIndex.next();
+				newd[j]=oldd[i];
+				j=j+1;
+
+			}
+			newls.add(newd);
+		}
+		return newls;
 	}
 }
