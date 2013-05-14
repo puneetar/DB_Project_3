@@ -72,23 +72,23 @@ public class Sql {
 		try {
 			List<List<Datum[]>> result=Sql.execFile(new File(filename));
 
-			TableBuilder output = new TableBuilder();
-			//			    for(Schema.Column c : querySchema){
-			//			      output.newCell(c.getName());
-			//			      cols++;
-			//			    }
-			Iterator<Datum[]> resultIterator=result.iterator().next().iterator();
-
-			output.addDividerLine();
-			while(resultIterator.hasNext()){
-				Datum[] row = resultIterator.next();
-				output.newRow();
-				for(Datum d : row){
-					output.newCell(d.toString());
-				}
-			}
-
-			System.out.println(output.toString());
+			//			TableBuilder output = new TableBuilder();
+			//			//			    for(Schema.Column c : querySchema){
+			//			//			      output.newCell(c.getName());
+			//			//			      cols++;
+			//			//			    }
+			//			Iterator<Datum[]> resultIterator=result.iterator().next().iterator();
+			//
+			//			output.addDividerLine();
+			//			while(resultIterator.hasNext()){
+			//				Datum[] row = resultIterator.next();
+			//				output.newRow();
+			//				for(Datum d : row){
+			//					output.newCell(d.toString());
+			//				}
+			//			}
+			//
+			//			System.out.println(output.toString());
 
 
 
@@ -103,15 +103,18 @@ public class Sql {
 
 	public static List<Datum[]> execQuery(Map<String, Schema.TableFromFile> tables,PlanNode q)throws SqlException
 	{	PushDownSelects objPush= new PushDownSelects(true);
-	//System.out.println(q);
-	PlanNode newq=objPush.rewrite(q);
-	//System.out.println(newq);
-	q=newq;
-	globalData(tables,q);
 	if(flag_explain==1){
 		System.out.println(q);
+	}
+	PlanNode newq=objPush.rewrite(q);
+	//System.out.println(newq);
+	if(flag_explain==1){
+		
 		System.out.println(newq);
 	}
+	q=newq;
+	globalData(tables,q);
+	
 	List<Datum[]> f1 = new ArrayList<Datum[]>();
 	List<Datum[]> f = new ArrayList<Datum[]>();
 
@@ -235,6 +238,26 @@ public class Sql {
 		while(it.hasNext()){
 			fin.add(Sql.execQuery(o.tables,it.next()));
 		}
+		it=o.queries.iterator();
+		List<Var> lsvar=it.next().getSchemaVars();
+
+		TableBuilder output = new TableBuilder();
+		output.newRow();
+		for(Schema.Var c : lsvar){
+			output.newCell(c.name);
+			//cols++;
+		}
+		Iterator<Datum[]> resultIterator=fin.iterator().next().iterator();
+
+		output.addDividerLine();
+		while(resultIterator.hasNext()){
+			Datum[] row = resultIterator.next();
+			output.newRow();
+			for(Datum d : row){
+				output.newCell(d.toString());
+			}
+		}
+		System.out.println(output.toString());
 		return fin; 
 	}
 
