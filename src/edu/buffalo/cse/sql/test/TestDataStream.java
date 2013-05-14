@@ -58,8 +58,8 @@ public class TestDataStream implements Iterator<Datum[]> {
 	int chaos;
 	TableFromFile tableFromFile;
 	
-	Map<Datum[], Datum[]> tree_lsDatum= new TreeMap<Datum[], Datum[]>(new DatumCompare());
-	Iterator<Entry<Datum[], Datum[]>> it_tree_lsDatum;
+	public Map<Datum[], ArrayList<Datum[]>> tree_lsDatum= new TreeMap<Datum[], ArrayList<Datum[]>>(new DatumCompare());
+	Iterator<Entry<Datum[], ArrayList<Datum[]>>> it_tree_lsDatum;
 
 	public TestDataStream(int keys, int values, int rows)
 	{ 
@@ -71,10 +71,10 @@ public class TestDataStream implements Iterator<Datum[]> {
 	{
 		this.tableFromFile= tableFromFile;
 		this.keyCols=keyCols;
-		if(this.tableFromFile!=null){
+		if(this.tableFromFile!=null && guaranteeKeyStep==false){
 			try {
 				readTableFromFile();
-				Set<Entry<Datum[], Datum[]>> set=tree_lsDatum.entrySet();
+				Set<Entry<Datum[], ArrayList<Datum[]>>> set=tree_lsDatum.entrySet();
 				it_tree_lsDatum=set.iterator();
 			//	it_lsDatum=lsDatum.iterator();
 			} catch (NumberFormatException e) {
@@ -102,7 +102,7 @@ public class TestDataStream implements Iterator<Datum[]> {
 
 	public Datum[] next()
 	{
-		return it_tree_lsDatum.next().getValue();
+		return it_tree_lsDatum.next().getValue().get(0);
 	}
 
 	public int getRowCount(){
@@ -186,7 +186,17 @@ Datum key[]=new Datum[this.keyCols.length];
 			for(int i:this.keyCols)
 				key[j++]=arrdatum[i];
 			
-			tree_lsDatum.put(key, arrdatum);
+			if(tree_lsDatum.containsKey(key)){
+				ArrayList<Datum[]> arr=tree_lsDatum.get(key);
+				arr.add(arrdatum);
+				tree_lsDatum.put(key, arr);
+			}else{
+				ArrayList<Datum[]> arr=new ArrayList<Datum[]>();
+				arr.add(arrdatum);
+				tree_lsDatum.put(key, arr);
+				//tree_lsDatum.put(key, new ArrayList<Datum[]>().add(arrdatum));	
+			}
+			
 			//tree_lsDatum.put(arrdatum[keyCols[0]], arrdatum);
 		//	lsDatum.add(arrdatum);
 		}

@@ -5,6 +5,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import edu.buffalo.cse.sql.Schema.TableFromFile;
 import edu.buffalo.cse.sql.data.Datum;
@@ -33,7 +36,7 @@ public class Index {
 	}
 
 
-	public static void createIndex(TableFromFile tableFromFile, IndexType type, int keyCols[]) throws Exception
+	public static TestDataStream createIndex(TableFromFile tableFromFile, IndexType type, int keyCols[]) throws Exception
 	{
 		int numOfkeys = keyCols.length;
 		int frames = 100;
@@ -42,7 +45,7 @@ public class Index {
 		BufferManager bm = new BufferManager(frames);
 		FileManager fm = new FileManager(bm);
 
-		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys,keyCols, 0, 0,0, true);
+		TestDataStream ds = new TestDataStream(tableFromFile,numOfkeys,keyCols, 0, 0,0, false);
 		IndexKeySpec keySpec = new GenericIndexKeySpec(ds.getSchema(), keyCols);
 
 		int indexSize = ds.getRowCount()/10;
@@ -58,9 +61,10 @@ public class Index {
 		}
 
 		ManagedFile file = fm.open(idxFile);
+		return ds;
 	}	
 
-	public static List<Datum[]> getFromIndex(TableFromFile tableFromFile, IndexType type, int keyCols[],Datum get[]) throws Exception
+	public static List<Datum[]> getFromIndex(TestDataStream ds2,TableFromFile tableFromFile, IndexType type, int keyCols[],Datum get[]) throws Exception
 	{
 		int numOfkeys = keyCols.length;
 		int frames = 100;
@@ -87,14 +91,28 @@ public class Index {
 				idx = new ISAMIndex(file, keySpec);
 				break;
 			}
-
-			System.out.println("Getting: "+Datum.stringOfRow(get));
-			return idx.get(get);
+			Iterator<Datum[]> scan = null;
+			try {
+				TreeMap<Datum[], ArrayList<Datum[]>> tree_lsDatum=(TreeMap<Datum[], ArrayList<Datum[]>>) ds2.tree_lsDatum;
+				ArrayList<Datum[]> sort_tree_lsDatum=tree_lsDatum.get(get);
+				scan=sort_tree_lsDatum.iterator();
+				List <Datum[]> return_list= new ArrayList<Datum[]>();
+				while(scan.hasNext()){
+					return_list.add(scan.next());
+				}
+				return return_list;
+			} finally {
+				try {
+					((IndexIterator)scan).close();
+				} catch(ClassCastException e) { }
+			}
+			//System.out.println("Getting: "+Datum.stringOfRow(get));
+			//return idx.get(get);
 		}
 		return null;
 	}
 
-	public static List<Datum[]> scanFromIndex(TableFromFile tableFromFile, IndexType type, int keyCols[],Datum from[],Datum to[]) throws Exception
+	public static List<Datum[]> scanFromIndex(TestDataStream ds2, TableFromFile tableFromFile, IndexType type, int keyCols[],Datum from[],Datum to[]) throws Exception
 	{
 		int numOfkeys = keyCols.length;
 		int frames = 100;
@@ -124,7 +142,7 @@ public class Index {
 				break;
 			}
 			Iterator<Datum[]> scan;
-			if(from == null){
+			if(from == null||from.length<1){
 				if(to == null){ scan = idx.scan(); }
 				else { scan = idx.rangeScanTo(to); }
 			} else {
@@ -133,6 +151,14 @@ public class Index {
 			}
 			
 			try {
+				TreeMap<Datum[], ArrayList<Datum[]>> tree_lsDatum=(TreeMap<Datum[], ArrayList<Datum[]>>) ds2.tree_lsDatum;
+				SortedMap<Datum[], ArrayList<Datum[]>> sort_tree_lsDatum=tree_lsDatum.headMap(to);
+				Iterator<ArrayList<Datum[]>> it_ArrayList=sort_tree_lsDatum.values().iterator();
+				ArrayList<Datum[]> arr_final=new ArrayList<Datum[]>();
+				while(it_ArrayList.hasNext()){
+					arr_final.addAll(it_ArrayList.next());
+				}
+				scan=arr_final.iterator();
 				List <Datum[]> return_list= new ArrayList<Datum[]>();
 				while(scan.hasNext()){
 					return_list.add(scan.next());

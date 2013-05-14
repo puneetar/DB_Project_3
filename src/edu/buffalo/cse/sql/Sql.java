@@ -33,6 +33,7 @@ import edu.buffalo.cse.sql.plan.ExprTree.OpCode;
 import edu.buffalo.cse.sql.plan.Expression;
 import edu.buffalo.cse.sql.plan.ExprTree.VarLeaf;
 import edu.buffalo.cse.sql.plan.PlanNode;
+import edu.buffalo.cse.sql.test.TestDataStream;
 import edu.buffalo.cse.sql.util.*;
 public class Sql {
 	public static List<List<Datum[]>> lsGlobalData = new ArrayList<List<Datum[]>>();
@@ -344,13 +345,13 @@ public class Sql {
 
 						switch(findType(lsic.get(0).getOpCode())){
 						case HASH:
-							Index.createIndex(tf, IndexType.HASH, arr_index);
-							List<Datum[]> lsIndexDatum=Index.getFromIndex(tf, IndexType.HASH, arr_index, arr_value);
+							TestDataStream ds=Index.createIndex(tf, IndexType.HASH, arr_index);
+							List<Datum[]> lsIndexDatum=Index.getFromIndex(ds,tf, IndexType.HASH, arr_index, arr_value);
 							lsMapGlobalData.put(tablename, lsIndexDatum);
 							lsGlobalData.add(lsIndexDatum);
 							break;
 						case ISAM:
-							Index.createIndex(tf, IndexType.ISAM, new int[]{arr_index[key_For_ISAM]});
+							TestDataStream ds1=Index.createIndex(tf, IndexType.ISAM, new int[]{arr_index[key_For_ISAM]});
 							lsic.remove(key_For_ISAM);
 							Datum datum_to[]=new Datum[1]; 
 
@@ -360,7 +361,8 @@ public class Sql {
 								datum_to[0]=arr_value[key_For_ISAM];
 
 
-							List<Datum[]> lsIndexDatum_isam=Index.scanFromIndex(tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
+							List<Datum[]> lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
+							if(lsic.size()>0)
 							lsIndexDatum_isam=applyOtherConditions(lsic,lsIndexDatum_isam);
 
 							lsMapGlobalData.put(tablename, lsIndexDatum_isam);

@@ -1,6 +1,8 @@
 package edu.buffalo.cse.sql.plan;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -292,15 +294,27 @@ public class Expression extends ExprTree {
 			case INT: 
 			case FLOAT:
 			case STRING:  
-				for(int i=0;i<lhs.size();i++){
-					for(int j=0;j<rhs.size();j++){
-						if(compare(lhs.get(i), rhs.get(j))){
-							ret.add(lhs.get(i));
-							break;
-						}
-					}
+//				for(int i=0;i<lhs.size();i++){
+//					for(int j=0;j<rhs.size();j++){
+//						if(Datum.compareRows(lhs.get(i), rhs.get(j))==0){
+//							ret.add(lhs.get(i));
+//							break;
+//						}
+//					}
+//				}
+				
+				HashSet<Datum[]> hash_set_lhs=new HashSet<Datum[]>();
+				Iterator<Datum[]> it_lhs=lhs.iterator();
+				while(it_lhs.hasNext()){
+					hash_set_lhs.add(it_lhs.next());
 				}
-
+				Iterator<Datum[]> it_rhs=rhs.iterator();
+				Datum[] dat;
+				while(it_rhs.hasNext()){
+					dat=it_rhs.next();
+					if(hash_set_lhs.contains(dat))
+						ret.add(dat);
+				}
 				return ret;
 
 			case BOOL:
@@ -915,7 +929,14 @@ public class Expression extends ExprTree {
 				else if(e.getClassName().equals("edu.buffalo.cse.sql.plan.Aggregate"))
 				{
 					//return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(cf.v.toInt()));
-					return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(0));
+					if(Sql.flag_TPCH==1){
+						d[0]=cf.v;
+						return new ManageList().toListOfDatumArray(d);
+					}
+					else{
+						return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(0));	
+					}
+					
 				}
 			}
 			
