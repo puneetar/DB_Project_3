@@ -46,6 +46,16 @@ public IndexScanNode(String table, String rangeVariable, Schema.Table schema,Lis
     String sep = "";
     
     sb.append(" [");
+    if(condition.size()>0){
+    	Iterator<ExprTree> itcondition= condition.iterator();
+    	while(itcondition.hasNext()){
+    		sb.append(sep);
+    		sb.append(itcondition.next().toString());
+    		 sep = ", ";
+    	}
+    	sb.append(";");
+    }
+    sep = "";
     sb.append(table);
     sb.append("(");
     for(Schema.Var v : getSchemaVars()){

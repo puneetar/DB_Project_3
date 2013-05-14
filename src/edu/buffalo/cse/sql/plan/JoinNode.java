@@ -46,6 +46,11 @@ public JType getJoinType(){ return type; }
         sb.append(type.toString());
         break;
     }
+    if(condition!=null && !condition.isEmpty()){
+    	sb.append("(");
+    	sb.append(condition.toString());
+    	sb.append(")");
+    }
     sb.append("]");
     return sb.toString();
   }
