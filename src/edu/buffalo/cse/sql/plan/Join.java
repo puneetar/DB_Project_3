@@ -156,10 +156,10 @@ public class Join extends JoinNode {
 				ArrayList<Datum[]> temp = hhj.get(row[idx2]);
 				Iterator<Datum[]> it3 = temp.iterator();
 				while(it3.hasNext()){
-//					if(num==k1+1000){
-//						k1=k1+1000;
-//						System.out.println("Join:" + num);
-//					}
+					if(num==k1+1000){
+						k1=k1+1000;
+						System.out.println("Join:" + num);
+					}
 					
 					Datum[] matchedRow = it3.next();
 					if(lhs.size()>=rhs.size()){

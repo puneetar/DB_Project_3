@@ -103,15 +103,18 @@ public class Sql {
 
 	public static List<Datum[]> execQuery(Map<String, Schema.TableFromFile> tables,PlanNode q)throws SqlException
 	{	PushDownSelects objPush= new PushDownSelects(true);
-	//System.out.println(q);
-	PlanNode newq=objPush.rewrite(q);
-	//System.out.println(newq);
-	q=newq;
-	globalData(tables,q);
 	if(flag_explain==1){
 		System.out.println(q);
+	}
+	PlanNode newq=objPush.rewrite(q);
+	//System.out.println(newq);
+	if(flag_explain==1){
+		
 		System.out.println(newq);
 	}
+	q=newq;
+	globalData(tables,q);
+	
 	List<Datum[]> f1 = new ArrayList<Datum[]>();
 	List<Datum[]> f = new ArrayList<Datum[]>();
 
