@@ -204,28 +204,6 @@ public class Sql {
 		f1 = f;
 	else
 		f1 = f.subList(0, flag_limit);
-	//----------------UTKARSH code : end Order By && LIMIT
-
-	//	TableBuilder output = new TableBuilder();
-	//	List<Schema.Var> list=q.getSchemaVars();
-	//	Iterator<Schema.Var> it=list.iterator();
-	//	while(it.hasNext()){
-	//		Schema.Var sc=it.next();
-	//		// output.newCell(sc.name);
-	//		System.out.println(sc.name+" : "+sc.rangeVariable);
-	//	}
-	//	Iterator<Datum[]> resultIterator=f1.iterator();
-	//
-	//	output.addDividerLine();
-	//	while(resultIterator.hasNext()){
-	//		Datum[] row = resultIterator.next();
-	//		output.newRow();
-	//		for(Datum d : row){
-	//			output.newCell(d.toString());
-	//		}
-	//	}
-	//
-	//	System.out.println(output.toString());
 	flag_hmp_tables_col_used=false;
 
 
@@ -236,10 +214,9 @@ public class Sql {
 	public static List<List<Datum[]>> execFile(File program)throws SqlException, FileNotFoundException, ParseException
 	{
 		SqlParser sp = new SqlParser(new FileReader(program));
-		//Object[] o = new Object[2];
 		Program o = SqlParser.Program();
 		List<List<Datum[]>> fin=new ArrayList<List<Datum[]>>();
-		//ArrayList<PlanNode> a1=(ArrayList<PlanNode>)o[1];
+
 		Iterator<PlanNode> it=o.queries.iterator();
 
 		while(it.hasNext()){
@@ -376,16 +353,16 @@ public class Sql {
 							Index.createIndex(tf, IndexType.ISAM, new int[]{arr_index[key_For_ISAM]});
 							lsic.remove(key_For_ISAM);
 							Datum datum_to[]=new Datum[1]; 
-							
+
 							if(arr_opCode[key_For_ISAM]==ExprTree.OpCode.LTE)
 								datum_to[0]=new Datum.Int(arr_value[key_For_ISAM].toInt()+1);	
 							else
 								datum_to[0]=arr_value[key_For_ISAM];
-							
-							
+
+
 							List<Datum[]> lsIndexDatum_isam=Index.scanFromIndex(tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
 							lsIndexDatum_isam=applyOtherConditions(lsic,lsIndexDatum_isam);
-							
+
 							lsMapGlobalData.put(tablename, lsIndexDatum_isam);
 							lsGlobalData.add(lsIndexDatum_isam);
 							break;
@@ -414,77 +391,77 @@ public class Sql {
 						while ((data = bufferedReader.readLine()) != null){ //reading each table
 							String arrtoken[];
 
-						if(flag_TPCH==0){
-							arrtoken=data.split(",");
-						}
-						else{
-							arrtoken=data.split("\\|");
-						}
-						//changes for Phase 3:starts
-						//Datum[] arrdatum=new Datum[arrtoken.length];
-						Datum[] arrdatum=new Datum[lsIndex.size()];//changed for Phase3
-						//for(int i=0;i<arrtoken.length;i++){
-						int i=0;
-						int j=0;
-						ilsIndex=lsIndex.iterator();
-						while(ilsIndex.hasNext()){ //change for Phase 3
-							i=ilsIndex.next();
-							//changes for Phase 3:ends
-							String token=arrtoken[i];
-							Schema.Column col=tf.get(i);
+							if(flag_TPCH==0){
+								arrtoken=data.split(",");
+							}
+							else{
+								arrtoken=data.split("\\|");
+							}
+							//changes for Phase 3:starts
+							//Datum[] arrdatum=new Datum[arrtoken.length];
+							Datum[] arrdatum=new Datum[lsIndex.size()];//changed for Phase3
+							//for(int i=0;i<arrtoken.length;i++){
+							int i=0;
+							int j=0;
+							ilsIndex=lsIndex.iterator();
+							while(ilsIndex.hasNext()){ //change for Phase 3
+								i=ilsIndex.next();
+								//changes for Phase 3:ends
+								String token=arrtoken[i];
+								Schema.Column col=tf.get(i);
 
-							if(col.type.equals(Schema.Type.INT)){
-								try {
-									datum= new Datum.Int(Integer.parseInt(token));
-								} catch (NumberFormatException e) {
-
-									//System.out.println("Not a Integer");
-									if(token.contains("#")){
-										System.out.println("contain #");
-										token=token.substring(token.indexOf("#")+1);
+								if(col.type.equals(Schema.Type.INT)){
+									try {
 										datum= new Datum.Int(Integer.parseInt(token));
-									}
-									else if(token.contains("-")){
-										//System.out.println("can be a date");
-										SimpleDateFormat df=new SimpleDateFormat("yyyy-mm-dd");
-										df.setLenient(false);
-										try {
-											df.parse(token);
-											token=token.replace("-","");
-											//System.out.println("the TOKEN is :"+token);
+									} catch (NumberFormatException e) {
+
+										//System.out.println("Not a Integer");
+										if(token.contains("#")){
+											System.out.println("contain #");
+											token=token.substring(token.indexOf("#")+1);
 											datum= new Datum.Int(Integer.parseInt(token));
-										} catch (java.text.ParseException e1) {
-
-											//e1.printStackTrace();
-											System.out.println("Contains \"-\" but not a date");
 										}
+										else if(token.contains("-")){
+											//System.out.println("can be a date");
+											SimpleDateFormat df=new SimpleDateFormat("yyyy-mm-dd");
+											df.setLenient(false);
+											try {
+												df.parse(token);
+												token=token.replace("-","");
+												//System.out.println("the TOKEN is :"+token);
+												datum= new Datum.Int(Integer.parseInt(token));
+											} catch (java.text.ParseException e1) {
 
+												//e1.printStackTrace();
+												System.out.println("Contains \"-\" but not a date");
+											}
+
+										}
+										else
+											e.printStackTrace();
 									}
-									else
-										e.printStackTrace();
+									//Schema.Type t=datum.getType();
+									//System.out.println(t);
 								}
-								//Schema.Type t=datum.getType();
-								//System.out.println(t);
-							}
-							else if(col.type.equals(Schema.Type.FLOAT)){
-								datum= new Flt(Float.parseFloat(token));
-							}
-							else if(col.type.equals(Schema.Type.BOOL)){
-								if(token.equals("True")){
-									datum= Bool.TRUE;
+								else if(col.type.equals(Schema.Type.FLOAT)){
+									datum= new Flt(Float.parseFloat(token));
 								}
-								else{
-									datum=Bool.FALSE;
+								else if(col.type.equals(Schema.Type.BOOL)){
+									if(token.equals("True")){
+										datum= Bool.TRUE;
+									}
+									else{
+										datum=Bool.FALSE;
+									}
 								}
-							}
-							else if(col.type.equals(Schema.Type.STRING)){
-								datum= new Str(token);
-							}
-							arrdatum[j]=datum;
-							j=j+1;
-						}//end of token array
-						lsDatum.add(arrdatum);
-						//lsDatum.get(0)[1].getType();
+								else if(col.type.equals(Schema.Type.STRING)){
+									datum= new Str(token);
+								}
+								arrdatum[j]=datum;
+								j=j+1;
+							}//end of token array
+							lsDatum.add(arrdatum);
+							//lsDatum.get(0)[1].getType();
 
 						}
 						bufferedReader.close();
@@ -630,12 +607,12 @@ public class Sql {
 	}
 
 	private static List<Datum[]> applyOtherConditions(List<IndexCondition> lsic,	List<Datum[]> lsIndexDatum_isam) {
-		
+
 		Iterator<IndexCondition> it_lsic=lsic.iterator();
 		int arr_index[]=new int[lsic.size()];
 		Datum arr_value[]=new Datum[lsic.size()];
 		ExprTree.OpCode arr_opCode[]=new ExprTree.OpCode[lsic.size()];
-	
+
 		int i=0;
 
 		while(it_lsic.hasNext()){
@@ -644,7 +621,7 @@ public class Sql {
 			arr_value[i]=index_cond.getValue();
 			arr_opCode[i++]=index_cond.getOpCode();
 		}
-		
+
 		Iterator<Datum[]> it_lsIndexDatum_isam=lsIndexDatum_isam.iterator();
 		List<Datum[]> return_list=new ArrayList<Datum[]>();
 		while(it_lsIndexDatum_isam.hasNext()){
@@ -662,7 +639,7 @@ public class Sql {
 				}
 			}
 		}
-		
+
 		return return_list;
 	}
 

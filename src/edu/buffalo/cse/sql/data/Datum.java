@@ -130,7 +130,11 @@ public abstract class Datum implements Comparator<Datum[]>, Comparable<Datum>{
 			return this.compareTo(datum)<=0?true:false;
 		case LT:
 			return this.compareTo(datum)<0?true:false;
+		default:
+			System.out.println("*****UNKNOWN OPERATION in applyOperation()");
+			break;
 		}
+		
 		return false;
 	}
 

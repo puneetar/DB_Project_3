@@ -34,7 +34,7 @@ public class Expression extends ExprTree {
 		this.data=data;
 		this.schemaOfData=schema;
 		this.expr=expr;
-		
+
 	}
 
 	public Expression(OpCode op, ExprTree child,List<Datum[]> data,List<Schema.Var> schema,ExprTree expr) {
@@ -42,7 +42,7 @@ public class Expression extends ExprTree {
 		this.data=data;
 		this.schemaOfData=schema;
 		this.expr=expr;
-		
+
 	}
 
 	public Expression(OpCode op, ExprTree lhs, ExprTree rhs,List<Datum[]> data,List<Schema.Var> schema,ExprTree expr) {
@@ -50,7 +50,7 @@ public class Expression extends ExprTree {
 		this.data=data;
 		this.schemaOfData=schema;
 		this.expr=expr;
-		
+
 	}
 
 
@@ -917,17 +917,11 @@ public class Expression extends ExprTree {
 					return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(0));
 				}
 			}
-			//			if(schemaOfData.isEmpty()){
-			//				d[0]=cf.v;
-			//				return new ManageList().toListOfDatumArray(d);	
-			//			}
-			//			else{
-			//				return new ManageList().toListOfDatumArray(new ManageList(data).getColumn(cf.v.toInt()));
-			//			}
+			
 
 		case VAR: {
 			ExprTree.VarLeaf vf= (ExprTree.VarLeaf)this.expr;
-			int index=-1;//=schemaOfData.indexOf(vf);
+			int index=-1;
 
 			// I can iterate over the schemaOfData and compare it with vf with method of Schema.Var equlas().
 			Iterator<Var> it=schemaOfData.iterator();
@@ -935,8 +929,8 @@ public class Expression extends ExprTree {
 			while(it.hasNext()){
 				Schema.Var var1=it.next();
 				if(Sql.tablemap.get(var1.rangeVariable)!=null)
-				if(Sql.tablemap.get(var1.rangeVariable).equals(vf.name.rangeVariable))
-					vf.name.rangeVariable=var1.rangeVariable;
+					if(Sql.tablemap.get(var1.rangeVariable).equals(vf.name.rangeVariable))
+						vf.name.rangeVariable=var1.rangeVariable;
 				if(var1.equals(vf.name))
 					index=i;
 				i++;
@@ -955,8 +949,6 @@ public class Expression extends ExprTree {
 
 	private boolean compare(Datum[] lhs,Datum[] rhs){
 
-		//System.out.println((lhs.length==rhs.length)?"\n*********\n":"\n*****they are not equal**** ");
-
 		try {
 			for(int i=0;i<lhs.length;i++){
 				if(lhs[i].equalsImpl(rhs[i])){
@@ -968,7 +960,7 @@ public class Expression extends ExprTree {
 
 			}
 		} catch (CastError e) {
-			
+
 			//System.out.println("***************Cast Error in Expression.compare() ");
 			e.printStackTrace();
 		}
@@ -1009,8 +1001,8 @@ public class Expression extends ExprTree {
 			}
 			ls1=new Expression(this.expr.get(0)).findColumns();
 			ls2=new Expression(this.expr.get(1)).findColumns();
-			
-			
+
+
 			it1=ls1.iterator();
 			while(it1.hasNext()){
 				ls.add(it1.next());
@@ -1030,7 +1022,7 @@ public class Expression extends ExprTree {
 			break;
 		}
 		case CONST:{
-			
+
 			break;
 		}
 		case VAR:{
