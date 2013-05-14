@@ -202,9 +202,9 @@ public class Sql {
 				}
 				else{
 					if(orderByMap.get(col1)==1)
-						finalMapdec.put(entry.getKey(), newDatumList);
+						finalMapdec.put(entry.getKey(), entry.getValue());
 					else
-						finalMapinc.put(entry.getKey(), newDatumList);
+						finalMapinc.put(entry.getKey(), entry.getValue());
 				}
 			}
 			if(orderByMap.get(col1)==1)
@@ -372,6 +372,10 @@ public class Sql {
 							}else if(index_cond.getOpCode()==ExprTree.OpCode.LTE && key_For_ISAM==-1){
 								key_For_ISAM=i-1;
 							}
+							else if(index_cond.getOpCode()==ExprTree.OpCode.GT && key_For_ISAM==-1){
+								key_For_ISAM=i-1;
+							}
+							
 						}
 
 
@@ -387,14 +391,26 @@ public class Sql {
 							TestDataStream ds1=Index.createIndex(tf, IndexType.ISAM, new int[]{arr_index[key_For_ISAM]});
 							lsic.remove(key_For_ISAM);
 							Datum datum_to[]=new Datum[1]; 
-
+							Datum datum_from[]=new Datum[1];
+							List<Datum[]> lsIndexDatum_isam = null;
+							
 							if(arr_opCode[key_For_ISAM]==ExprTree.OpCode.LTE)
-								datum_to[0]=new Datum.Int(arr_value[key_For_ISAM].toInt()+1);	
-							else
+							{
+								datum_to[0]=new Datum.Int(arr_value[key_For_ISAM].toInt()+1);
+								lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
+							}	
+							else if(arr_opCode[key_For_ISAM]==ExprTree.OpCode.LT)
+							{
 								datum_to[0]=arr_value[key_For_ISAM];
+								lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
+							}
+							else if(arr_opCode[key_For_ISAM]==ExprTree.OpCode.GT)
+							{
+								datum_from[0]=arr_value[key_For_ISAM];
+								lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},datum_from,new Datum[0] );
+							}
 
-
-							List<Datum[]> lsIndexDatum_isam=Index.scanFromIndex(ds1,tf, IndexType.ISAM,  new int[]{arr_index[key_For_ISAM]},new Datum[0],datum_to );
+							
 							if(lsic.size()>0)
 								lsIndexDatum_isam=applyOtherConditions(lsic,lsIndexDatum_isam);
 							List<Datum[]> lsnewDatum_isam=removeColumns(lsIndexDatum_isam,hmp,lscolumn,tablename);

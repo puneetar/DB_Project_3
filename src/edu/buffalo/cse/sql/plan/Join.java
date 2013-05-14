@@ -146,7 +146,8 @@ public class Join extends JoinNode {
 		num=0;
 		int k1=0;
 		//Datum[] res = new Datum[r+m];
-		while(it2.hasNext()){		
+		while(it2.hasNext()){	
+			//System.gc();
 			Datum[] row = it2.next();
 			Datum[] res = new Datum[primary.size()+secondary.size()];
 			num=num+1;
