@@ -158,3 +158,6 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+/index_ISAM_orders.tbl
+/index_ISAM_lineitem.tbl
+/index_HASH_customer.tbl
